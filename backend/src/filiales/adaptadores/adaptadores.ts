@@ -24,8 +24,8 @@ abstract class AdaptadorBase implements AdaptadorDatosFilial {
     try {
       this.traducir(contenido, moneda, lote);
     } catch (e) {
-      if (e instanceof ErrorValidacion) throw e;
-      throw new ErrorValidacion(`El archivo no tiene el formato ${this.formato}: ${(e as Error).message}`);
+      const detalle = (e as Error).message;
+      throw new ErrorValidacion(`El archivo no tiene el formato esperado (${this.formato}): ${detalle}`);
     }
     return lote;
   }

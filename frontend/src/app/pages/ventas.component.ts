@@ -38,13 +38,16 @@ import { CargandoComponent, EncabezadoComponent, VacioComponent } from '../share
           </div>
           <div class="col-6 col-md-2">
             <label class="form-label" for="v-cant">Cantidad</label>
-            <input id="v-cant" type="number" min="1" class="form-control" formControlName="cantidad">
+            <input id="v-cant" type="number" min="1" class="form-control" formControlName="cantidad" [class.is-invalid]="excedeStock()">
+            @if (stockDisponible() !== null) {
+              <div class="form-text" [class.text-danger]="excedeStock()">Disponible: {{ stockDisponible() }} u.</div>
+            }
           </div>
           <div class="col-6 col-md-2">
             <label class="form-label" for="v-precio">Precio unit. ({{ monedaFilial() }})</label>
             <input id="v-precio" type="number" min="0.01" step="0.01" class="form-control" formControlName="precioUnitario">
           </div>
-          <div class="col-md-2 d-grid"><button class="btn btn-success" type="submit" [disabled]="form.invalid || guardando()">Registrar</button></div>
+          <div class="col-md-2 d-grid"><button class="btn btn-success" type="submit" [disabled]="form.invalid || guardando() || excedeStock()">Registrar</button></div>
           <div class="col-12 small text-body-secondary">El precio se ingresa en la moneda local de la filial; SERF lo convierte a EUR al consolidar. La venta descuenta el stock.</div>
         </div>
       </form>
@@ -112,6 +115,16 @@ export class VentasComponent implements OnInit {
   protected readonly desde = signal(haceDiasISO(30));
   protected readonly hasta = signal(hoyISO());
   private readonly filialForm = signal('');
+  private readonly skuForm = signal('');
+  private readonly cantidadForm = signal(1);
+  private readonly inventario = signal<{ filialCodigo: string; sku: string; cantidad: number }[]>([]);
+
+  /** Muestra el stock antes de vender (hallazgo de la prueba de usabilidad). */
+  protected readonly stockDisponible = computed(() => {
+    if (!this.skuForm()) return null;
+    return this.inventario().find((i) => i.filialCodigo === this.filialForm() && i.sku === this.skuForm())?.cantidad ?? 0;
+  });
+  protected readonly excedeStock = computed(() => this.stockDisponible() !== null && this.cantidadForm() > this.stockDisponible()!);
   private tasas: Record<string, number> = {};
 
   protected readonly form = inject(NonNullableFormBuilder).group({
@@ -134,6 +147,9 @@ export class VentasComponent implements OnInit {
       this.filialForm.set(v);
       this.sugerirPrecio();
     });
+    this.form.controls.sku.valueChanges.subscribe((v) => this.skuForm.set(v));
+    this.form.controls.cantidad.valueChanges.subscribe((v) => this.cantidadForm.set(Number(v) || 0));
+    this.cargarInventario();
     this.api.productos().subscribe((p) => this.productos.set(p.filter((x) => x.activo)));
     this.api.configuracion().subscribe((c) => (this.tasas = c.tasasCambio));
     this.cargar();
@@ -158,12 +174,17 @@ export class VentasComponent implements OnInit {
         this.guardando.set(false);
         this.notificaciones.exito(`Venta registrada: ${venta.cantidad} × ${venta.sku}.`);
         this.cargar();
+        this.cargarInventario();
       },
       error: (e) => {
         this.guardando.set(false);
         this.notificaciones.error(mensajeError(e));
       },
     });
+  }
+
+  private cargarInventario(): void {
+    this.api.inventario().subscribe((i) => this.inventario.set(i));
   }
 
   protected cargar(): void {

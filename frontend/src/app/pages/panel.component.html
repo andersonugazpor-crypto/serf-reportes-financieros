@@ -51,7 +51,7 @@
               <tbody>
                 @for (f of d.porFilial; track f.codigo) {
                   <tr>
-                    <td><span class="me-1">{{ bandera[f.codigo] }}</span>{{ f.nombre }}</td>
+                    <td class="text-nowrap"><span class="me-1">{{ bandera[f.codigo] }}</span>{{ f.nombre }}</td>
                     <td class="text-end small">{{ f.ingresosLocal | cifra: 'moneda' : f.monedaLocal }}</td>
                     <td class="text-end fw-semibold">{{ f.ingresos | cifra: 'moneda' : 'EUR' }}</td>
                     <td class="text-end">

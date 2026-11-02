@@ -47,12 +47,17 @@ import { EncabezadoComponent } from '../shared/ui.components';
           <div class="card-body p-4">
             <h2 class="h6 fw-semibold"><span class="badge rounded-pill text-bg-primary me-2">3</span>Archivo de la filial</h2>
             <input type="file" class="form-control mb-2" accept=".json,.csv,.xml,.txt" (change)="leerArchivo($event)" [disabled]="!filial()">
-            <textarea class="form-control font-monospace small" rows="9" placeholder="…o pega aquí el contenido del archivo" [(ngModel)]="contenido" [disabled]="!filial()" aria-label="Contenido del archivo"></textarea>
+            <textarea class="form-control font-monospace small" rows="9" placeholder="…o pega aquí el contenido del archivo" [(ngModel)]="contenido" (ngModelChange)="vista.set(null)" [disabled]="!filial()" aria-label="Contenido del archivo"></textarea>
             <div class="d-flex gap-2 mt-3">
               <button class="btn btn-outline-primary" [disabled]="!puedeEnviar()" (click)="previsualizar()"><i class="bi bi-eye me-1"></i>Previsualizar</button>
               <button class="btn btn-success" [disabled]="!puedeEnviar() || !vista()" (click)="importar()"><i class="bi bi-cloud-arrow-up me-1"></i>Importar</button>
             </div>
-            @if (!vista() && contenido) {
+            @if (errorFormato(); as err) {
+              <div class="alert alert-danger small mt-3 mb-0" role="alert">
+                <i class="bi bi-x-octagon me-1"></i>{{ err }}
+                <div class="mt-1">Compáralo con el <strong>formato esperado</strong> de la izquierda o usa el ejemplo.</div>
+              </div>
+            } @else if (!vista() && contenido) {
               <p class="small text-body-secondary mt-2 mb-0">Primero previsualiza para revisar cómo se interpretó el archivo.</p>
             }
           </div>
@@ -116,6 +121,8 @@ export class IntegracionComponent implements OnInit {
   protected readonly vista = signal<VistaPreviaImportacion | null>(null);
   protected readonly resultado = signal<ResultadoImportacion | null>(null);
   protected readonly enviando = signal(false);
+  /** Error de formato mostrado junto al archivo (no solo en un toast que desaparece). */
+  protected readonly errorFormato = signal<string | null>(null);
   protected contenido = '';
 
   protected readonly formato = computed(() => this.formatos().find((f) => f.formato === this.filial()?.formatoDatos) ?? null);
@@ -136,6 +143,7 @@ export class IntegracionComponent implements OnInit {
     this.contenido = '';
     this.vista.set(null);
     this.resultado.set(null);
+    this.errorFormato.set(null);
   }
 
   protected cargarEjemplo(): void {
@@ -156,6 +164,7 @@ export class IntegracionComponent implements OnInit {
     if (!f) return;
     this.enviando.set(true);
     this.resultado.set(null);
+    this.errorFormato.set(null);
     this.api.previsualizarImportacion(f.codigo, this.contenido).subscribe({
       next: (v) => {
         this.enviando.set(false);
@@ -164,7 +173,7 @@ export class IntegracionComponent implements OnInit {
       error: (e) => {
         this.enviando.set(false);
         this.vista.set(null);
-        this.notificaciones.error(mensajeError(e));
+        this.errorFormato.set(mensajeError(e));
       },
     });
   }

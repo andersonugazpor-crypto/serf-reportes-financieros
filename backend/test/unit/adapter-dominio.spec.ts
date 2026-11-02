@@ -63,7 +63,7 @@ describe('Patrón Adapter', () => {
 
   it('rechaza archivos vacíos o con formato incorrecto', () => {
     expect(() => new AdaptadorEspana().adaptar('   ', 'EUR')).toThrow(ErrorValidacion);
-    expect(() => new AdaptadorEspana().adaptar('no es json', 'EUR')).toThrow('formato JSON_ES');
+    expect(() => new AdaptadorEspana().adaptar('no es json', 'EUR')).toThrow('formato esperado (JSON_ES)');
     expect(() => new AdaptadorPeru().adaptar('<reporte></reporte>', 'PEN')).toThrow(ErrorValidacion);
   });
 
