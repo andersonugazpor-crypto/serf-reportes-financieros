@@ -10,7 +10,7 @@ Aplicación web para **FinanCorp S.A.** que integra las ventas e inventarios de 
 |---|---|
 | **Integrante** | Anderson Leonel Ugaz Portales |
 | **Prototipo en Figma** | https://www.figma.com/design/qZo7vqocsxK4J7az6jBP6d/SERF?node-id=1002-25&t=6uQu6qEmF4cVJNUX-1 (modo presentación: https://www.figma.com/proto/qZo7vqocsxK4J7az6jBP6d/SERF) |
-| **Prototipo interactivo (HTML)** | https://claude.ai/artifact/SEvDNcQDCHTzC4shDhpgTM · [cómo llevarlo a Figma](docs/02-diseno-wireframes-y-prototipo.md#cómo-recrear-el-prototipo-en-figma) |
+| **Prototipo HTML (sin conexión)** | [`docs/prototipo/index.html`](docs/prototipo/index.html): se abre en cualquier navegador · [cómo llevarlo a Figma](docs/02-diseno-wireframes-y-prototipo.md#cómo-recrear-el-prototipo-en-figma) |
 | **Tecnologías** | TypeScript · NestJS 11 (backend) · Angular 21 + Bootstrap 5 (frontend) · Jest y Vitest (pruebas) |
 | **Documento de sustentación** | [`docs/SERF-Sustentacion-Tecnica.pdf`](docs/SERF-Sustentacion-Tecnica.pdf) |
 
