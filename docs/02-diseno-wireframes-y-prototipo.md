@@ -2,11 +2,14 @@
 
 ## Prototipo navegable
 
+- **Prototipo en Figma:** https://www.figma.com/design/qZo7vqocsxK4J7az6jBP6d/SERF?node-id=1002-25&t=6uQu6qEmF4cVJNUX-1
+  - Modo presentación: https://www.figma.com/proto/qZo7vqocsxK4J7az6jBP6d/SERF
+  - Flujo principal de 6 pantallas: inicio de sesión → panel → reporte paso 1 → paso 2 → paso 3 → reporte generado.
 - **Prototipo interactivo (enlace compartible):** https://claude.ai/artifact/SEvDNcQDCHTzC4shDhpgTM
 - **Archivo fuente:** [`prototipo/index.html`](prototipo/index.html). Se abre en cualquier navegador, sin instalar nada.
 - **Funciones:** 10 pantallas enlazadas, cambio entre vista **escritorio** y **móvil**, opción "Mostrar zonas clicables" y notas de diseño con el patrón que usa cada pantalla.
 
-> **Figma.** La rúbrica pide el enlace compartido de Figma. Abajo están los pasos para recrear el prototipo en Figma a partir de las imágenes de esta carpeta y obtener ese enlace.
+> **Figma.** El enlace de arriba es el prototipo en Figma, armado con las imágenes de esta carpeta. Al final están los pasos que se siguieron para crearlo.
 
 ## Wireframes (escritorio)
 
