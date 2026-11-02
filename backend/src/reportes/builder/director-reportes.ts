@@ -80,11 +80,21 @@ export class DirectorReportes {
           d.porFilial.map((f) => [f.nombre, f.monedaLocal, f.ingresosLocal, f.ingresos, f.unidades, f.transacciones]),
           ['Total', '', '', d.totales.ingresos, d.totales.unidades, d.totales.transacciones],
         )
-        .grafico('Participación por filial', 'torta', d.porFilial.map((f) => ({ etiqueta: f.nombre, valor: f.ingresos })), d.moneda),
+        .grafico(
+          'Participación por filial',
+          'torta',
+          d.porFilial.map((f) => ({ etiqueta: f.nombre, valor: f.ingresos })),
+          d.moneda,
+        ),
     );
     destino('ventas-categoria', (s) =>
       s
-        .grafico('Ingresos por categoría', 'barras', d.porCategoria.map((c) => ({ etiqueta: c.etiqueta, valor: c.ingresos })), d.moneda)
+        .grafico(
+          'Ingresos por categoría',
+          'barras',
+          d.porCategoria.map((c) => ({ etiqueta: c.etiqueta, valor: c.ingresos })),
+          d.moneda,
+        )
         .tabla(
           'Detalle por categoría',
           [
@@ -96,7 +106,12 @@ export class DirectorReportes {
         ),
     );
     destino('ventas-tendencia', (s) => {
-      s.grafico('Ingresos por mes', 'linea', d.porMes.map((p) => ({ etiqueta: p.periodo, valor: p.ingresos })), d.moneda);
+      s.grafico(
+        'Ingresos por mes',
+        'linea',
+        d.porMes.map((p) => ({ etiqueta: p.periodo, valor: p.ingresos })),
+        d.moneda,
+      );
       if (d.productos.length) {
         s.subseccion('Productos más vendidos', (sub) =>
           sub.tabla(
@@ -107,7 +122,10 @@ export class DirectorReportes {
               { titulo: 'Unidades', formato: 'numero' },
               { titulo: 'Ingresos', formato: 'moneda' },
             ],
-            [...d.productos].sort((a, z) => z.unidades - a.unidades).slice(0, 5).map((p) => [p.sku, p.nombre, p.unidades, p.ingresos]),
+            [...d.productos]
+              .sort((a, z) => z.unidades - a.unidades)
+              .slice(0, 5)
+              .map((p) => [p.sku, p.nombre, p.unidades, p.ingresos]),
           ),
         );
       }
@@ -132,7 +150,12 @@ export class DirectorReportes {
           d.porFilial.map((f) => [f.nombre, f.ingresos, f.costo, f.margen, pct(f.margenPct)]),
           ['Total', d.totales.ingresos, d.totales.costo, d.totales.margen, pct(d.totales.margenPct)],
         )
-        .grafico('Margen % por filial', 'barras', d.porFilial.map((f) => ({ etiqueta: f.nombre, valor: pct(f.margenPct) })), '%'),
+        .grafico(
+          'Margen % por filial',
+          'barras',
+          d.porFilial.map((f) => ({ etiqueta: f.nombre, valor: pct(f.margenPct) })),
+          '%',
+        ),
     );
     destino('margen-producto', (s) => {
       const ordenados = [...d.productos].sort((a, z) => z.margen - a.margen);
@@ -149,7 +172,10 @@ export class DirectorReportes {
       const bajos = ordenados.filter((p) => p.margenPct < d.margenObjetivo);
       if (bajos.length) {
         s.subseccion('Por debajo del margen objetivo', (sub) =>
-          sub.parrafo(`${bajos.length} producto(s) no alcanzan el ${pct(d.margenObjetivo)} %: ${bajos.map((p) => p.sku).join(', ')}.`, 'alerta'),
+          sub.parrafo(
+            `${bajos.length} producto(s) no alcanzan el ${pct(d.margenObjetivo)} %: ${bajos.map((p) => p.sku).join(', ')}.`,
+            'alerta',
+          ),
         );
       }
     });
@@ -172,14 +198,22 @@ export class DirectorReportes {
           d.inventario.porFilial.map((f) => [f.nombre, f.unidades, f.valorizado, f.productosCriticos]),
           ['Total', d.inventario.unidadesTotales, d.inventario.valorTotal, d.inventario.criticos.length],
         )
-        .grafico('Valor del inventario por filial', 'barras', d.inventario.porFilial.map((f) => ({ etiqueta: f.nombre, valor: f.valorizado })), d.moneda),
+        .grafico(
+          'Valor del inventario por filial',
+          'barras',
+          d.inventario.porFilial.map((f) => ({ etiqueta: f.nombre, valor: f.valorizado })),
+          d.moneda,
+        ),
     );
     destino('inventario-criticos', (s) => {
       if (!d.inventario.criticos.length) {
         s.parrafo('No hay productos por debajo del stock mínimo.');
         return;
       }
-      s.parrafo(`Productos con menos de ${d.inventario.stockMinimo} unidades: requieren nueva importación.`, 'alerta').tabla(
+      s.parrafo(
+        `Productos con menos de ${d.inventario.stockMinimo} unidades: requieren nueva importación.`,
+        'alerta',
+      ).tabla(
         'Stock crítico',
         [
           { titulo: 'Filial', formato: 'texto' },

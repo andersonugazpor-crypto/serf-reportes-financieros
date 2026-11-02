@@ -2,7 +2,14 @@ import { ConfiguracionCorporativa } from '../../configuracion/configuracion-corp
 import { Moneda } from '../../comun/dinero';
 import { asegurar } from '../../comun/errores';
 import { Grafico, Indicador, Parrafo, Seccion, Tabla } from '../composite/componentes';
-import { Celda, ColumnaTabla, EstiloParrafo, FormatoIndicador, PuntoSerie, TipoGrafico } from '../composite/nodo-reporte';
+import {
+  Celda,
+  ColumnaTabla,
+  EstiloParrafo,
+  FormatoIndicador,
+  PuntoSerie,
+  TipoGrafico,
+} from '../composite/nodo-reporte';
 import { Reporte } from '../decorator/reporte';
 import { PlantillaReporte } from '../prototype/plantilla-reporte';
 
@@ -149,7 +156,7 @@ export class ReporteBuilder {
         tipo: this.plantilla.tipo,
         plantillaId: this.plantilla.id,
         ambito: this.plantilla.ambito,
-        periodo: { desde: this.desde!, hasta: this.hasta! },
+        periodo: { desde: this.desde, hasta: this.hasta },
         filiales: this.filiales,
         moneda: this.moneda,
         locale: this.plantilla.locale,

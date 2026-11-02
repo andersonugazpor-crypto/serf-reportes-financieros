@@ -1,5 +1,15 @@
 import { Body, Controller, Get, HttpCode, Module, Post, Query } from '@nestjs/common';
-import { IsInt, IsNumber, IsOptional, IsPositive, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
+import {
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Length,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { Usuario } from '../auth/auth.service';
 import { filialesPermitidas, Roles, UsuarioActual } from '../auth/seguridad';
 import { FilialesModule } from '../filiales/filiales.module';
@@ -36,7 +46,10 @@ class VentasController {
     const filtro = filial ? [filial.toUpperCase()] : usuario.rol === 'FILIAL' ? [usuario.filial!] : undefined;
     const filiales = filtro ? filialesPermitidas(usuario, filtro) : undefined;
     const ventas = this.ventas.listar({ filiales, sku, desde, hasta });
-    return { total: ventas.length, ventas: ventas.slice(0, Math.min(Number(limite) || 200, 1000)).map((v) => v.aDto()) };
+    return {
+      total: ventas.length,
+      ventas: ventas.slice(0, Math.min(Number(limite) || 200, 1000)).map((v) => v.aDto()),
+    };
   }
 
   @Roles('ADMIN', 'FILIAL')

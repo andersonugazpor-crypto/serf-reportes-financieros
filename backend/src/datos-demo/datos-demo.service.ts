@@ -1,7 +1,14 @@
 import { Inject, Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfiguracionCorporativa } from '../configuracion/configuracion-corporativa';
 import { Dinero } from '../comun/dinero';
-import { CONFIGURACION, POOL_CONEXIONES, REPO_FILIALES, REPO_PRODUCTOS, REPO_STOCK, REPO_VENTAS } from '../comun/tokens';
+import {
+  CONFIGURACION,
+  POOL_CONEXIONES,
+  REPO_FILIALES,
+  REPO_PRODUCTOS,
+  REPO_STOCK,
+  REPO_VENTAS,
+} from '../comun/tokens';
 import { DatosFilial, Filial } from '../filiales/filial';
 import { PoolConexiones } from '../infraestructura/persistencia/pool-conexiones';
 import { Repositorio } from '../infraestructura/persistencia/repositorio';
@@ -10,26 +17,162 @@ import { DatosProducto, Producto } from '../productos/producto';
 import { Venta } from '../ventas/venta';
 
 export const FILIALES_DEMO: DatosFilial[] = [
-  { codigo: 'ES', nombre: 'FinanCorp España', pais: 'España', ciudad: 'Madrid', region: 'EUROPA', moneda: 'EUR', formatoDatos: 'JSON_ES' },
-  { codigo: 'DE', nombre: 'FinanCorp Deutschland', pais: 'Alemania', ciudad: 'Berlín', region: 'EUROPA', moneda: 'EUR', formatoDatos: 'CSV_DE' },
-  { codigo: 'MX', nombre: 'FinanCorp México', pais: 'México', ciudad: 'Ciudad de México', region: 'LATAM', moneda: 'MXN', formatoDatos: 'CSV_MX' },
-  { codigo: 'PE', nombre: 'FinanCorp Perú', pais: 'Perú', ciudad: 'Lima', region: 'LATAM', moneda: 'PEN', formatoDatos: 'XML_PE' },
-  { codigo: 'CO', nombre: 'FinanCorp Colombia', pais: 'Colombia', ciudad: 'Bogotá', region: 'LATAM', moneda: 'COP', formatoDatos: 'ESTANDAR' },
+  {
+    codigo: 'ES',
+    nombre: 'FinanCorp España',
+    pais: 'España',
+    ciudad: 'Madrid',
+    region: 'EUROPA',
+    moneda: 'EUR',
+    formatoDatos: 'JSON_ES',
+  },
+  {
+    codigo: 'DE',
+    nombre: 'FinanCorp Deutschland',
+    pais: 'Alemania',
+    ciudad: 'Berlín',
+    region: 'EUROPA',
+    moneda: 'EUR',
+    formatoDatos: 'CSV_DE',
+  },
+  {
+    codigo: 'MX',
+    nombre: 'FinanCorp México',
+    pais: 'México',
+    ciudad: 'Ciudad de México',
+    region: 'LATAM',
+    moneda: 'MXN',
+    formatoDatos: 'CSV_MX',
+  },
+  {
+    codigo: 'PE',
+    nombre: 'FinanCorp Perú',
+    pais: 'Perú',
+    ciudad: 'Lima',
+    region: 'LATAM',
+    moneda: 'PEN',
+    formatoDatos: 'XML_PE',
+  },
+  {
+    codigo: 'CO',
+    nombre: 'FinanCorp Colombia',
+    pais: 'Colombia',
+    ciudad: 'Bogotá',
+    region: 'LATAM',
+    moneda: 'COP',
+    formatoDatos: 'ESTANDAR',
+  },
 ];
 
 export const PRODUCTOS_DEMO: DatosProducto[] = [
-  { sku: 'LT-001', nombre: 'Laptop Huawei MateBook D15', categoria: 'LAPTOP', marca: 'Huawei', proveedor: 'Huawei Technologies (Shenzhen)', costoImportacionUsd: 520, precioListaEur: 899 },
-  { sku: 'LT-002', nombre: 'Laptop Lenovo IdeaPad Slim 5', categoria: 'LAPTOP', marca: 'Lenovo', proveedor: 'Lenovo Group (Pekín)', costoImportacionUsd: 480, precioListaEur: 829 },
-  { sku: 'LT-003', nombre: 'Laptop Xiaomi RedmiBook Pro 15', categoria: 'LAPTOP', marca: 'Xiaomi', proveedor: 'Xiaomi Corp. (Pekín)', costoImportacionUsd: 640, precioListaEur: 1149 },
-  { sku: 'SP-101', nombre: 'Smartphone Xiaomi Redmi Note 14 Pro', categoria: 'SMARTPHONE', marca: 'Xiaomi', proveedor: 'Xiaomi Corp. (Pekín)', costoImportacionUsd: 210, precioListaEur: 399 },
-  { sku: 'SP-102', nombre: 'Smartphone OPPO Reno 12', categoria: 'SMARTPHONE', marca: 'OPPO', proveedor: 'Guangdong OPPO (Dongguan)', costoImportacionUsd: 260, precioListaEur: 499 },
-  { sku: 'SP-103', nombre: 'Smartphone Honor Magic 6 Lite', categoria: 'SMARTPHONE', marca: 'Honor', proveedor: 'Honor Device Co. (Shenzhen)', costoImportacionUsd: 190, precioListaEur: 349 },
-  { sku: 'AC-201', nombre: 'Audífonos Anker Soundcore Liberty 4', categoria: 'ACCESORIO', marca: 'Anker', proveedor: 'Anker Innovations (Changsha)', costoImportacionUsd: 22, precioListaEur: 59 },
-  { sku: 'AC-202', nombre: 'Power bank Baseus 20 000 mAh', categoria: 'ACCESORIO', marca: 'Baseus', proveedor: 'Baseus Technology (Shenzhen)', costoImportacionUsd: 14, precioListaEur: 39 },
-  { sku: 'AC-203', nombre: 'Smartwatch Amazfit GTR 4', categoria: 'ACCESORIO', marca: 'Amazfit', proveedor: 'Zepp Health (Hefei)', costoImportacionUsd: 85, precioListaEur: 179 },
-  { sku: 'RD-301', nombre: 'Router TP-Link Archer AX55 Wi-Fi 6', categoria: 'REDES', marca: 'TP-Link', proveedor: 'TP-Link Technologies (Shenzhen)', costoImportacionUsd: 48, precioListaEur: 109 },
-  { sku: 'RD-302', nombre: 'Switch TP-Link 24 puertos Gigabit', categoria: 'REDES', marca: 'TP-Link', proveedor: 'TP-Link Technologies (Shenzhen)', costoImportacionUsd: 72, precioListaEur: 159 },
-  { sku: 'RD-303', nombre: 'Access point Huawei AX3 Pro', categoria: 'REDES', marca: 'Huawei', proveedor: 'Huawei Technologies (Shenzhen)', costoImportacionUsd: 35, precioListaEur: 79 },
+  {
+    sku: 'LT-001',
+    nombre: 'Laptop Huawei MateBook D15',
+    categoria: 'LAPTOP',
+    marca: 'Huawei',
+    proveedor: 'Huawei Technologies (Shenzhen)',
+    costoImportacionUsd: 520,
+    precioListaEur: 899,
+  },
+  {
+    sku: 'LT-002',
+    nombre: 'Laptop Lenovo IdeaPad Slim 5',
+    categoria: 'LAPTOP',
+    marca: 'Lenovo',
+    proveedor: 'Lenovo Group (Pekín)',
+    costoImportacionUsd: 480,
+    precioListaEur: 829,
+  },
+  {
+    sku: 'LT-003',
+    nombre: 'Laptop Xiaomi RedmiBook Pro 15',
+    categoria: 'LAPTOP',
+    marca: 'Xiaomi',
+    proveedor: 'Xiaomi Corp. (Pekín)',
+    costoImportacionUsd: 640,
+    precioListaEur: 1149,
+  },
+  {
+    sku: 'SP-101',
+    nombre: 'Smartphone Xiaomi Redmi Note 14 Pro',
+    categoria: 'SMARTPHONE',
+    marca: 'Xiaomi',
+    proveedor: 'Xiaomi Corp. (Pekín)',
+    costoImportacionUsd: 210,
+    precioListaEur: 399,
+  },
+  {
+    sku: 'SP-102',
+    nombre: 'Smartphone OPPO Reno 12',
+    categoria: 'SMARTPHONE',
+    marca: 'OPPO',
+    proveedor: 'Guangdong OPPO (Dongguan)',
+    costoImportacionUsd: 260,
+    precioListaEur: 499,
+  },
+  {
+    sku: 'SP-103',
+    nombre: 'Smartphone Honor Magic 6 Lite',
+    categoria: 'SMARTPHONE',
+    marca: 'Honor',
+    proveedor: 'Honor Device Co. (Shenzhen)',
+    costoImportacionUsd: 190,
+    precioListaEur: 349,
+  },
+  {
+    sku: 'AC-201',
+    nombre: 'Audífonos Anker Soundcore Liberty 4',
+    categoria: 'ACCESORIO',
+    marca: 'Anker',
+    proveedor: 'Anker Innovations (Changsha)',
+    costoImportacionUsd: 22,
+    precioListaEur: 59,
+  },
+  {
+    sku: 'AC-202',
+    nombre: 'Power bank Baseus 20 000 mAh',
+    categoria: 'ACCESORIO',
+    marca: 'Baseus',
+    proveedor: 'Baseus Technology (Shenzhen)',
+    costoImportacionUsd: 14,
+    precioListaEur: 39,
+  },
+  {
+    sku: 'AC-203',
+    nombre: 'Smartwatch Amazfit GTR 4',
+    categoria: 'ACCESORIO',
+    marca: 'Amazfit',
+    proveedor: 'Zepp Health (Hefei)',
+    costoImportacionUsd: 85,
+    precioListaEur: 179,
+  },
+  {
+    sku: 'RD-301',
+    nombre: 'Router TP-Link Archer AX55 Wi-Fi 6',
+    categoria: 'REDES',
+    marca: 'TP-Link',
+    proveedor: 'TP-Link Technologies (Shenzhen)',
+    costoImportacionUsd: 48,
+    precioListaEur: 109,
+  },
+  {
+    sku: 'RD-302',
+    nombre: 'Switch TP-Link 24 puertos Gigabit',
+    categoria: 'REDES',
+    marca: 'TP-Link',
+    proveedor: 'TP-Link Technologies (Shenzhen)',
+    costoImportacionUsd: 72,
+    precioListaEur: 159,
+  },
+  {
+    sku: 'RD-303',
+    nombre: 'Access point Huawei AX3 Pro',
+    categoria: 'REDES',
+    marca: 'Huawei',
+    proveedor: 'Huawei Technologies (Shenzhen)',
+    costoImportacionUsd: 35,
+    precioListaEur: 79,
+  },
 ];
 
 /** Factor de precio local respecto al precio de lista (estrategia comercial de cada filial). */
@@ -95,7 +238,8 @@ export class DatosDemoService implements OnApplicationBootstrap {
           const cantidad = p.categoria === 'ACCESORIO' ? 1 + Math.floor(azar() * 5) : 1 + Math.floor(azar() * 2);
           const tasa = this.config.tasaHaciaConsolidacion(filial.moneda);
           const precioLocal = (p.precioLista.monto * FACTOR_PRECIO[filial.codigo] * (0.95 + azar() * 0.1)) / tasa;
-          const redondeado = filial.moneda === 'COP' ? Math.round(precioLocal / 1000) * 1000 : Math.round(precioLocal * 100) / 100;
+          const redondeado =
+            filial.moneda === 'COP' ? Math.round(precioLocal / 1000) * 1000 : Math.round(precioLocal * 100) / 100;
           total++;
           this.ventas.guardar(
             new Venta({
@@ -111,7 +255,9 @@ export class DatosDemoService implements OnApplicationBootstrap {
         }
       }
     }
-    this.logger.log(`Datos de demostración cargados: ${FILIALES_DEMO.length} filiales, ${productos.length} productos, ${total} ventas.`);
+    this.logger.log(
+      `Datos de demostración cargados: ${FILIALES_DEMO.length} filiales, ${productos.length} productos, ${total} ventas.`,
+    );
     return { filiales: FILIALES_DEMO.length, productos: productos.length, ventas: total };
   }
 }

@@ -30,7 +30,11 @@ export class ExportadorHtml implements Exportador {
 
   exportar(doc: DocumentoReporte): ArchivoExportado {
     const m = doc.metadatos;
-    const fmtMoneda = new Intl.NumberFormat(m.locale, { style: 'currency', currency: m.moneda, maximumFractionDigits: 0 });
+    const fmtMoneda = new Intl.NumberFormat(m.locale, {
+      style: 'currency',
+      currency: m.moneda,
+      maximumFractionDigits: 0,
+    });
     const fmtNumero = new Intl.NumberFormat(m.locale, { maximumFractionDigits: 2 });
     const celda = (valor: Celda, col: ColumnaTabla | undefined): string => {
       if (typeof valor !== 'number') return escaparHtml(valor);
@@ -60,13 +64,19 @@ export class ExportadorHtml implements Exportador {
           return `<p class="${nodo.estilo}">${escaparHtml(nodo.texto)}</p>`;
         case 'indicador': {
           const valor =
-            nodo.formato === 'moneda' ? fmtMoneda.format(nodo.valor) : nodo.formato === 'porcentaje' ? `${fmtNumero.format(nodo.valor)} %` : fmtNumero.format(nodo.valor);
+            nodo.formato === 'moneda'
+              ? fmtMoneda.format(nodo.valor)
+              : nodo.formato === 'porcentaje'
+                ? `${fmtNumero.format(nodo.valor)} %`
+                : fmtNumero.format(nodo.valor);
           return `<div class="kpi${nodo.alerta ? ' alerta' : ''}"><small>${escaparHtml(nodo.etiqueta)}</small><strong>${valor}</strong>${nodo.detalle ? `<em>${escaparHtml(nodo.detalle)}</em>` : ''}</div>`;
         }
         case 'tabla':
           return `<table><caption>${escaparHtml(nodo.titulo)}</caption><thead><tr>${nodo.columnas.map((c) => `<th>${escaparHtml(c.titulo)}</th>`).join('')}</tr></thead><tbody>${nodo.filas
             .map((f) => `<tr>${f.map((v, i) => `<td>${celda(v, nodo.columnas[i])}</td>`).join('')}</tr>`)
-            .join('')}</tbody>${nodo.totales ? `<tfoot><tr>${nodo.totales.map((v, i) => `<td>${celda(v, nodo.columnas[i])}</td>`).join('')}</tr></tfoot>` : ''}</table>`;
+            .join(
+              '',
+            )}</tbody>${nodo.totales ? `<tfoot><tr>${nodo.totales.map((v, i) => `<td>${celda(v, nodo.columnas[i])}</td>`).join('')}</tr></tfoot>` : ''}</table>`;
         case 'grafico':
           return grafico(nodo);
       }
@@ -75,7 +85,9 @@ export class ExportadorHtml implements Exportador {
     const indice = doc.indice.length
       ? `<nav><h2>Índice</h2><ol>${doc.indice.map((e) => `<li style="margin-left:${(e.nivel - 1) * 18}px">${e.numeracion}. ${escaparHtml(e.titulo)}</li>`).join('')}</ol></nav>`
       : '';
-    const marca = doc.marcasAgua.length ? `<div class="marca-agua">${escaparHtml(doc.marcasAgua.join(' · '))}</div>` : '';
+    const marca = doc.marcasAgua.length
+      ? `<div class="marca-agua">${escaparHtml(doc.marcasAgua.join(' · '))}</div>`
+      : '';
     const firma = doc.firma
       ? `<p class="firma">Firma ${doc.firma.algoritmo}: <code>${doc.firma.valor}</code><br>Firmado por ${escaparHtml(doc.firma.firmadoPor)} el ${doc.firma.firmadoEn}</p>`
       : '';
@@ -103,9 +115,13 @@ footer{border-top:1px solid #e5e7eb;margin-top:32px;padding-top:12px;font-size:1
 </style></head><body>${marca}<header>${doc.encabezados
       .slice(0, -1)
       .map((e) => `<div class="aviso">${escaparHtml(e)}</div>`)
-      .join('')}<h1>${escaparHtml(m.titulo)}</h1><div class="meta">${escaparHtml(m.empresa)} · Periodo ${m.periodo.desde} al ${m.periodo.hasta} · Filiales: ${m.filiales.join(', ')} · Moneda: ${m.moneda} · Generado por ${escaparHtml(m.generadoPor)} el ${m.generadoEn.slice(0, 16).replace('T', ' ')} UTC</div></header>${indice}${doc.cuerpo.hijos
+      .join(
+        '',
+      )}<h1>${escaparHtml(m.titulo)}</h1><div class="meta">${escaparHtml(m.empresa)} · Periodo ${m.periodo.desde} al ${m.periodo.hasta} · Filiales: ${m.filiales.join(', ')} · Moneda: ${m.moneda} · Generado por ${escaparHtml(m.generadoPor)} el ${m.generadoEn.slice(0, 16).replace('T', ' ')} UTC</div></header>${indice}${doc.cuerpo.hijos
       .map(render)
-      .join('')}<footer>${doc.pies.map((p) => `<p>${escaparHtml(p)}</p>`).join('')}<p>Capas aplicadas: ${doc.capas.map(escaparHtml).join(' → ')}</p>${firma}</footer></body></html>`;
+      .join(
+        '',
+      )}<footer>${doc.pies.map((p) => `<p>${escaparHtml(p)}</p>`).join('')}<p>Capas aplicadas: ${doc.capas.map(escaparHtml).join(' → ')}</p>${firma}</footer></body></html>`;
 
     return { nombre: nombreArchivo(doc, 'html'), tipoMime: 'text/html; charset=utf-8', contenido: html };
   }
@@ -116,7 +132,11 @@ export class ExportadorCsv implements Exportador {
   readonly formato = 'CSV' as const;
 
   exportar(doc: DocumentoReporte): ArchivoExportado {
-    const lineas: string[] = [`# ${doc.metadatos.titulo}`, `# Periodo;${doc.metadatos.periodo.desde};${doc.metadatos.periodo.hasta}`, `# Moneda;${doc.metadatos.moneda}`];
+    const lineas: string[] = [
+      `# ${doc.metadatos.titulo}`,
+      `# Periodo;${doc.metadatos.periodo.desde};${doc.metadatos.periodo.hasta}`,
+      `# Moneda;${doc.metadatos.moneda}`,
+    ];
     const esc = (v: Celda) => {
       const t = String(v);
       return /[;"\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
@@ -124,7 +144,11 @@ export class ExportadorCsv implements Exportador {
     const recorrer = (nodo: NodoReporte, ruta: string[]): void => {
       if (nodo.tipo === 'seccion') nodo.hijos.forEach((h) => recorrer(h, [...ruta, nodo.titulo]));
       else if (nodo.tipo === 'tabla') {
-        lineas.push('', `# ${[...ruta.slice(1), nodo.titulo].join(' > ')}`, nodo.columnas.map((c) => esc(c.titulo)).join(';'));
+        lineas.push(
+          '',
+          `# ${[...ruta.slice(1), nodo.titulo].join(' > ')}`,
+          nodo.columnas.map((c) => esc(c.titulo)).join(';'),
+        );
         nodo.filas.forEach((f) => lineas.push(f.map(esc).join(';')));
         if (nodo.totales) lineas.push(nodo.totales.map(esc).join(';'));
       }
@@ -132,7 +156,11 @@ export class ExportadorCsv implements Exportador {
     recorrer(doc.cuerpo, []);
     if (doc.firma) lineas.push('', `# Firma ${doc.firma.algoritmo};${doc.firma.valor}`);
     // BOM para que Excel reconozca UTF-8 (tildes y ñ).
-    return { nombre: nombreArchivo(doc, 'csv'), tipoMime: 'text/csv; charset=utf-8', contenido: '﻿' + lineas.join('\n') };
+    return {
+      nombre: nombreArchivo(doc, 'csv'),
+      tipoMime: 'text/csv; charset=utf-8',
+      contenido: '﻿' + lineas.join('\n'),
+    };
   }
 }
 
@@ -141,7 +169,11 @@ export class ExportadorJson implements Exportador {
   readonly formato = 'JSON' as const;
 
   exportar(doc: DocumentoReporte): ArchivoExportado {
-    return { nombre: nombreArchivo(doc, 'json'), tipoMime: 'application/json', contenido: JSON.stringify(doc, null, 2) };
+    return {
+      nombre: nombreArchivo(doc, 'json'),
+      tipoMime: 'application/json',
+      contenido: JSON.stringify(doc, null, 2),
+    };
   }
 }
 

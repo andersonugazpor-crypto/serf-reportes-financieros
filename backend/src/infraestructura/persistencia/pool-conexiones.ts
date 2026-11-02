@@ -64,9 +64,7 @@ export class PoolConexiones {
 
   static obtenerInstancia(): PoolConexiones {
     if (!PoolConexiones.instancia) {
-      PoolConexiones.instancia = new PoolConexiones(
-        ConfiguracionCorporativa.obtenerInstancia().tamanoPoolConexiones,
-      );
+      PoolConexiones.instancia = new PoolConexiones(ConfiguracionCorporativa.obtenerInstancia().tamanoPoolConexiones);
     }
     return PoolConexiones.instancia;
   }

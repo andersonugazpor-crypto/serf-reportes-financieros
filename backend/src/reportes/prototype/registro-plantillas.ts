@@ -175,6 +175,8 @@ export class RegistroPlantillas {
 
   /** Todas las variantes por país que se pueden obtener por clonación. */
   listarVariantes(): PlantillaReporte[] {
-    return [...this.bases.keys()].flatMap((tipo) => Object.keys(PERFILES_PAIS).map((ambito) => this.obtener(tipo, ambito)));
+    return [...this.bases.keys()].flatMap((tipo) =>
+      Object.keys(PERFILES_PAIS).map((ambito) => this.obtener(tipo, ambito)),
+    );
   }
 }

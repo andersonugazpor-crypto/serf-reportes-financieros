@@ -21,7 +21,10 @@ export class ProductosService {
         (p) =>
           (!filtro.categoria || p.categoria === filtro.categoria) &&
           (!filtro.soloActivos || p.activo) &&
-          (!texto || p.sku.toLowerCase().includes(texto) || p.nombre.toLowerCase().includes(texto) || p.marca.toLowerCase().includes(texto)),
+          (!texto ||
+            p.sku.toLowerCase().includes(texto) ||
+            p.nombre.toLowerCase().includes(texto) ||
+            p.marca.toLowerCase().includes(texto)),
       )
       .sort((a, b) => a.sku.localeCompare(b.sku));
   }

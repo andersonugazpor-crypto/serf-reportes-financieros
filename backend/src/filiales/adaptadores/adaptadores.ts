@@ -256,6 +256,8 @@ export class AdaptadorEstandar extends AdaptadorBase {
         moneda,
       }),
     );
-    (datos.inventario ?? []).forEach((s, i) => this.agregarStock(lote, `Inventario ${i + 1}`, s.sku, Number(s.cantidad)));
+    (datos.inventario ?? []).forEach((s, i) =>
+      this.agregarStock(lote, `Inventario ${i + 1}`, s.sku, Number(s.cantidad)),
+    );
   }
 }

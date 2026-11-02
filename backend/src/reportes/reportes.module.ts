@@ -71,7 +71,10 @@ class ReportesController {
 
   @Post()
   generar(@UsuarioActual() usuario: Usuario, @Body() dto: GenerarReporteDto) {
-    const filiales = filialesPermitidas(usuario, dto.filiales.map((f) => f.toUpperCase()));
+    const filiales = filialesPermitidas(
+      usuario,
+      dto.filiales.map((f) => f.toUpperCase()),
+    );
     return this.fachada.generar({ ...dto, filiales }, usuario);
   }
 
@@ -95,7 +98,12 @@ class ReportesController {
   }
 
   @Get(':id/descargar')
-  descargar(@UsuarioActual() usuario: Usuario, @Param('id') id: string, @Query('formato') formato: string = 'HTML', @Res() res: Response) {
+  descargar(
+    @UsuarioActual() usuario: Usuario,
+    @Param('id') id: string,
+    @Query('formato') formato: string = 'HTML',
+    @Res() res: Response,
+  ) {
     filialesPermitidas(usuario, this.fachada.obtener(id).documento.metadatos.filiales);
     const archivo = this.fachada.exportar(id, formato.toUpperCase() as FormatoExportacion);
     res.setHeader('Content-Type', archivo.tipoMime);
@@ -113,11 +121,20 @@ class PanelController {
   ) {}
 
   @Get()
-  obtener(@UsuarioActual() usuario: Usuario, @Query('desde') desde: string, @Query('hasta') hasta: string, @Query('filiales') filiales?: string) {
+  obtener(
+    @UsuarioActual() usuario: Usuario,
+    @Query('desde') desde: string,
+    @Query('hasta') hasta: string,
+    @Query('filiales') filiales?: string,
+  ) {
     const hoy = new Date().toISOString().slice(0, 10);
     const inicio = desde && FECHA.test(desde) ? desde : `${hoy.slice(0, 7)}-01`;
     const fin = hasta && FECHA.test(hasta) ? hasta : hoy;
-    const pedidas = filiales ? filiales.split(',').map((f) => f.trim().toUpperCase()) : usuario.rol === 'FILIAL' ? [usuario.filial!] : null;
+    const pedidas = filiales
+      ? filiales.split(',').map((f) => f.trim().toUpperCase())
+      : usuario.rol === 'FILIAL'
+        ? [usuario.filial!]
+        : null;
     const todas = this.filiales.listar(true).map((f) => f.codigo);
     return this.consolidacion.consolidar(inicio, fin, pedidas ? filialesPermitidas(usuario, pedidas) : todas);
   }

@@ -138,7 +138,9 @@ export class FirmaDigitalDecorator extends DecoradorReporte {
 export class VerificadorFirma {
   static calcular(documento: DocumentoReporte): string {
     const secreto = ConfiguracionCorporativa.obtenerInstancia().secretoDeFirma;
-    return createHmac('sha256', secreto).update(VerificadorFirma.canonico({ ...documento, firma: null })).digest('hex');
+    return createHmac('sha256', secreto)
+      .update(VerificadorFirma.canonico({ ...documento, firma: null }))
+      .digest('hex');
   }
 
   static verificar(documento: DocumentoReporte): boolean {

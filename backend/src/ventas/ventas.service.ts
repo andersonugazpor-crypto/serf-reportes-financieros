@@ -51,7 +51,13 @@ export class VentasService {
   }
 
   /** Venta registrada en mostrador: valida filial, producto y descuenta stock. */
-  registrar(datos: { filialCodigo: string; sku: string; cantidad: number; precioUnitario: number; fecha?: string }): Venta {
+  registrar(datos: {
+    filialCodigo: string;
+    sku: string;
+    cantidad: number;
+    precioUnitario: number;
+    fecha?: string;
+  }): Venta {
     const filial = this.filiales.obtenerActiva(datos.filialCodigo);
     const producto = this.productos.obtener(datos.sku);
     if (!producto.activo) throw new ErrorConflicto(`El producto ${producto.sku} está descontinuado.`);
@@ -86,7 +92,9 @@ export class VentasService {
       throw new ErrorValidacion('El archivo no contiene ventas ni existencias válidas.');
     }
     const advertencias = [...lote.advertencias];
-    const referencias = new Set(this.repo.listar((v) => v.filialCodigo === filial.codigo).map((v) => v.referenciaExterna));
+    const referencias = new Set(
+      this.repo.listar((v) => v.filialCodigo === filial.codigo).map((v) => v.referenciaExterna),
+    );
     let importadas = 0;
     let duplicadas = 0;
 

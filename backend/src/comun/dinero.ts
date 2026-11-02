@@ -58,9 +58,6 @@ export class Dinero {
   }
 
   private mismaMoneda(otro: Dinero): void {
-    asegurar(
-      this.moneda === otro.moneda,
-      `No se puede operar ${this.moneda} con ${otro.moneda} sin convertir.`,
-    );
+    asegurar(this.moneda === otro.moneda, `No se puede operar ${this.moneda} con ${otro.moneda} sin convertir.`);
   }
 }

@@ -93,7 +93,9 @@ export class GeneradorReportesFacade {
 
     const plantilla = this.plantillas.obtener(solicitud.tipo, ambito);
     const builder = ReporteBuilder.desdePlantilla(plantilla).generadoPor(usuario.nombre);
-    const titulo = solicitud.titulo?.trim() || `${TITULOS[solicitud.tipo]} — ${ambito === 'CORPORATIVO' ? 'Consolidado' : datos.filiales[0].nombre}`;
+    const titulo =
+      solicitud.titulo?.trim() ||
+      `${TITULOS[solicitud.tipo]} — ${ambito === 'CORPORATIVO' ? 'Consolidado' : datos.filiales[0].nombre}`;
     const reporte = this.director.construir(solicitud.tipo, builder, datos, titulo);
 
     const decorado = this.aplicarCapas(reporte, solicitud.opciones ?? {}, usuario);
@@ -140,7 +142,15 @@ export class GeneradorReportesFacade {
     return registro;
   }
 
-  listarHistorial(usuario: Usuario): { id: string; titulo: string; tipo: TipoReporte; filiales: string[]; generadoEn: string; generadoPor: string; firmado: boolean }[] {
+  listarHistorial(usuario: Usuario): {
+    id: string;
+    titulo: string;
+    tipo: TipoReporte;
+    filiales: string[];
+    generadoEn: string;
+    generadoPor: string;
+    firmado: boolean;
+  }[] {
     return this.historial
       .listar((r) => usuario.rol !== 'FILIAL' || r.documento.metadatos.filiales.every((f) => f === usuario.filial))
       .map((r) => ({
@@ -168,7 +178,10 @@ export class GeneradorReportesFacade {
   }
 
   plantillasDisponibles() {
-    return { bases: this.plantillas.listarBases().map((p) => p.aDto()), variantes: this.plantillas.listarVariantes().map((p) => p.aDto()) };
+    return {
+      bases: this.plantillas.listarBases().map((p) => p.aDto()),
+      variantes: this.plantillas.listarVariantes().map((p) => p.aDto()),
+    };
   }
 
   /** Las capas se apilan en orden; la firma siempre va al final para cubrir todo lo anterior. */

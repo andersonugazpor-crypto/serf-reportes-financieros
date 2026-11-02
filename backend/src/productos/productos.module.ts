@@ -28,7 +28,11 @@ class ProductosController {
   constructor(private readonly productos: ProductosService) {}
 
   @Get()
-  listar(@Query('texto') texto?: string, @Query('categoria') categoria?: Categoria, @Query('activos') activos?: string) {
+  listar(
+    @Query('texto') texto?: string,
+    @Query('categoria') categoria?: Categoria,
+    @Query('activos') activos?: string,
+  ) {
     return this.productos.listar({ texto, categoria, soloActivos: activos === 'true' }).map((p) => p.aDto());
   }
 

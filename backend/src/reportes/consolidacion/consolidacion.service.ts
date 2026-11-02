@@ -33,7 +33,18 @@ export class ConsolidacionService {
     const porFilial = new Map<string, ResumenFilial>(
       filiales.map((f) => [
         f.codigo,
-        { codigo: f.codigo, nombre: f.nombre, monedaLocal: f.moneda, ingresosLocal: 0, ingresos: 0, costo: 0, margen: 0, margenPct: 0, unidades: 0, transacciones: 0 },
+        {
+          codigo: f.codigo,
+          nombre: f.nombre,
+          monedaLocal: f.moneda,
+          ingresosLocal: 0,
+          ingresos: 0,
+          costo: 0,
+          margen: 0,
+          margenPct: 0,
+          unidades: 0,
+          transacciones: 0,
+        },
       ]),
     );
     const porCategoria = new Map<Categoria, ResumenCategoria>();
@@ -70,7 +81,15 @@ export class ConsolidacionService {
       mes.unidades += v.cantidad;
       porMes.set(v.periodo, mes);
 
-      const p = porProducto.get(v.sku) ?? { sku: v.sku, nombre: producto.nombre, categoria: producto.categoria, unidades: 0, ingresos: 0, margen: 0, margenPct: 0 };
+      const p = porProducto.get(v.sku) ?? {
+        sku: v.sku,
+        nombre: producto.nombre,
+        categoria: producto.categoria,
+        unidades: 0,
+        ingresos: 0,
+        margen: 0,
+        margenPct: 0,
+      };
       p.unidades += v.cantidad;
       p.ingresos += ingreso;
       p.margen += ingreso - costo;
@@ -79,7 +98,14 @@ export class ConsolidacionService {
 
     const resumenFiliales = [...porFilial.values()].map((f) => {
       const margen = f.ingresos - f.costo;
-      return { ...f, ingresosLocal: r2(f.ingresosLocal), ingresos: r2(f.ingresos), costo: r2(f.costo), margen: r2(margen), margenPct: f.ingresos ? margen / f.ingresos : 0 };
+      return {
+        ...f,
+        ingresosLocal: r2(f.ingresosLocal),
+        ingresos: r2(f.ingresos),
+        costo: r2(f.costo),
+        margen: r2(margen),
+        margenPct: f.ingresos ? margen / f.ingresos : 0,
+      };
     });
     const ingresos = resumenFiliales.reduce((s, f) => s + f.ingresos, 0);
     const costo = resumenFiliales.reduce((s, f) => s + f.costo, 0);
@@ -95,20 +121,33 @@ export class ConsolidacionService {
         codigo: f.codigo,
         nombre: f.nombre,
         unidades: propios.reduce((s, x) => s + x.cantidad, 0),
-        valorizado: r2(propios.reduce((s, x) => s + x.cantidad * this.productos.obtener(x.sku).costoImportacion.monto * tasaUsd, 0)),
+        valorizado: r2(
+          propios.reduce((s, x) => s + x.cantidad * this.productos.obtener(x.sku).costoImportacion.monto * tasaUsd, 0),
+        ),
         productosCriticos: propios.filter((x) => x.esCritico(minimo)).length,
       };
     });
     const criticos = stocks
       .filter((s) => s.esCritico(minimo))
-      .map((s) => ({ filial: s.filialCodigo, sku: s.sku, nombre: this.productos.obtener(s.sku).nombre, cantidad: s.cantidad }))
+      .map((s) => ({
+        filial: s.filialCodigo,
+        sku: s.sku,
+        nombre: this.productos.obtener(s.sku).nombre,
+        cantidad: s.cantidad,
+      }))
       .sort((a, b) => a.cantidad - b.cantidad);
 
     const alertas: string[] = [];
     resumenFiliales
       .filter((f) => f.transacciones > 0 && f.margenPct < this.config.margenObjetivo)
-      .forEach((f) => alertas.push(`${f.nombre}: margen de ${(f.margenPct * 100).toFixed(1)} %, por debajo del objetivo corporativo.`));
-    resumenFiliales.filter((f) => f.transacciones === 0).forEach((f) => alertas.push(`${f.nombre}: no registró ventas en el periodo.`));
+      .forEach((f) =>
+        alertas.push(
+          `${f.nombre}: margen de ${(f.margenPct * 100).toFixed(1)} %, por debajo del objetivo corporativo.`,
+        ),
+      );
+    resumenFiliales
+      .filter((f) => f.transacciones === 0)
+      .forEach((f) => alertas.push(`${f.nombre}: no registró ventas en el periodo.`));
     if (criticos.length) alertas.push(`${criticos.length} combinación(es) filial/producto con stock crítico.`);
 
     return {
@@ -128,8 +167,15 @@ export class ConsolidacionService {
       porCategoria: [...porCategoria.values()]
         .map((c) => ({ ...c, ingresos: r2(c.ingresos), costo: r2(c.costo), margen: r2(c.ingresos - c.costo) }))
         .sort((a, b) => b.ingresos - a.ingresos),
-      porMes: [...porMes.values()].map((m) => ({ ...m, ingresos: r2(m.ingresos) })).sort((a, b) => a.periodo.localeCompare(b.periodo)),
-      productos: [...porProducto.values()].map((p) => ({ ...p, ingresos: r2(p.ingresos), margen: r2(p.margen), margenPct: p.ingresos ? p.margen / p.ingresos : 0 })),
+      porMes: [...porMes.values()]
+        .map((m) => ({ ...m, ingresos: r2(m.ingresos) }))
+        .sort((a, b) => a.periodo.localeCompare(b.periodo)),
+      productos: [...porProducto.values()].map((p) => ({
+        ...p,
+        ingresos: r2(p.ingresos),
+        margen: r2(p.margen),
+        margenPct: p.ingresos ? p.margen / p.ingresos : 0,
+      })),
       inventario: {
         porFilial: inventarioFiliales,
         criticos,
