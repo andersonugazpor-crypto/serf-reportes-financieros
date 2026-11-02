@@ -1,0 +1,18 @@
+# Dependencias
+node_modules/
+
+# Compilados
+dist/
+backend/dist/
+frontend/dist/
+.angular/
+*.tsbuildinfo
+
+# Pruebas
+coverage/
+
+# Entorno y sistema
+.env
+.DS_Store
+Thumbs.db
+*.log
