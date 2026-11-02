@@ -1,0 +1,63 @@
+classDiagram
+  direction LR
+  class Entidad~TDto~ {
+    <<abstract>>
+    +id string
+    +creadoEn Date
+    +aDto()* TDto
+  }
+  class Filial {
+    +codigo string
+    +moneda Moneda
+    -_formatoDatos FormatoDatos
+    -_activa boolean
+    +desactivar()
+  }
+  class Producto {
+    +sku string
+    +categoria Categoria
+    -_costoImportacion Dinero
+    -_precioLista Dinero
+    +actualizarPrecios(costoUsd, precioEur)
+    +descontinuar()
+  }
+  class Stock {
+    -_cantidad number
+    +ingresar(u)
+    +retirar(u)
+    +fijar(c)
+    +esCritico(minimo) boolean
+  }
+  class Venta {
+    +fecha Date
+    +cantidad number
+    +precioUnitario Dinero
+    +origen OrigenVenta
+    +total Dinero
+  }
+  class Dinero {
+    <<Value Object>>
+    -centimos number
+    +moneda Moneda
+    +sumar(otro) Dinero
+    +convertir(destino, tasa) Dinero
+  }
+  class Repositorio~T~ {
+    <<interface>>
+    +guardar(e) T
+    +buscarPorId(id) T
+    +listar(filtro) T[]
+  }
+  class RepositorioEnMemoria~T~
+  Entidad <|-- Filial
+  Entidad <|-- Producto
+  Entidad <|-- Stock
+  Entidad <|-- Venta
+  Repositorio <|.. RepositorioEnMemoria
+  RepositorioEnMemoria ..> PoolConexiones
+  Filial "1" -- "0..*" Stock
+  Producto "1" -- "0..*" Stock
+  Filial "1" -- "0..*" Venta
+  Producto "1" -- "0..*" Venta
+  Producto *-- Dinero
+  Venta *-- Dinero

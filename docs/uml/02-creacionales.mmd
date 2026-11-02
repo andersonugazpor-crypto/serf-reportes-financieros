@@ -1,0 +1,102 @@
+classDiagram
+  direction LR
+  class ConfiguracionCorporativa {
+    <<Singleton>>
+    -instancia$ ConfiguracionCorporativa
+    -politicas PoliticasCorporativas
+    -tasasCambio Record~Moneda,number~
+    -secretoFirma string
+    -ConfiguracionCorporativa()
+    +obtenerInstancia()$ ConfiguracionCorporativa
+    +tasaHaciaConsolidacion(moneda) number
+    +actualizarTasa(moneda, tasa) void
+    +actualizarPoliticas(cambios) void
+    +vista() VistaConfiguracion
+  }
+  class PoolConexiones {
+    <<Singleton>>
+    -instancia$ PoolConexiones
+    -conexiones Conexion[]
+    -PoolConexiones(tamano)
+    +obtenerInstancia()$ PoolConexiones
+    +adquirir() Conexion
+    +liberar(c) void
+    +ejecutar(operacion) R
+    +estado() EstadoPool
+  }
+  class Conexion {
+    +numero number
+    +tabla(nombre) Map
+  }
+  PoolConexiones "1" *-- "5" Conexion
+  PoolConexiones ..> ConfiguracionCorporativa : tamaño del pool
+
+  class Prototipo~T~ {
+    <<interface>>
+    +clonar() T
+  }
+  class PlantillaReporte {
+    <<Prototype>>
+    -estilo EstiloPlantilla
+    -textosLegales string[]
+    -estructura Seccion
+    +clonar() PlantillaReporte
+    +personalizarPara(opciones) this
+    +obtenerEstructura() Seccion
+  }
+  class RegistroPlantillas {
+    <<Gestor de prototipos>>
+    -bases Map~TipoReporte,PlantillaReporte~
+    +obtener(tipo, ambito) PlantillaReporte
+    +listarVariantes() PlantillaReporte[]
+  }
+  Prototipo <|.. PlantillaReporte
+  RegistroPlantillas o-- "4" PlantillaReporte : bases
+
+  class ReporteBuilder {
+    <<Builder>>
+    -raiz Seccion
+    +desdePlantilla(p)$ ReporteBuilder
+    +conTitulo(t) this
+    +paraPeriodo(desde, hasta) this
+    +deFiliales(codigos) this
+    +enMoneda(m) this
+    +seccion(clave, configurar) this
+    +construir() Reporte
+  }
+  class SeccionBuilder {
+    +parrafo(texto) this
+    +tabla(titulo, columnas, filas) this
+    +grafico(titulo, tipo, serie) this
+    +indicador(etiqueta, valor) this
+    +subseccion(titulo, configurar) this
+  }
+  class DirectorReportes {
+    <<Director>>
+    +construir(tipo, builder, datos, titulo) Reporte
+  }
+  class Reporte {
+    <<Producto>>
+  }
+  DirectorReportes ..> ReporteBuilder : usa
+  ReporteBuilder ..> SeccionBuilder : crea
+  ReporteBuilder ..> PlantillaReporte : parte de un clon
+  ReporteBuilder ..> Reporte : construye
+
+  class FabricaExportadores {
+    <<Factory>>
+    -creadores Map
+    +crear(formato) Exportador
+    +registrar(formato, creador)
+  }
+  class Exportador {
+    <<interface>>
+    +exportar(doc) ArchivoExportado
+  }
+  class ExportadorHtml
+  class ExportadorCsv
+  class ExportadorJson
+  Exportador <|.. ExportadorHtml
+  Exportador <|.. ExportadorCsv
+  Exportador <|.. ExportadorJson
+  FabricaExportadores ..> Exportador : crea

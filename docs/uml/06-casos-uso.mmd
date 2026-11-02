@@ -1,0 +1,21 @@
+flowchart LR
+  G(["👤 Gerente corporativo<br/>(ADMIN)"])
+  A(["👤 Analista financiero"])
+  O(["👤 Operador de filial"])
+  subgraph SERF["Sistema SERF"]
+    CU1(["Consultar panel consolidado"])
+    CU2(["Generar reporte financiero"])
+    CU3(["Generar reporte rápido mensual"])
+    CU4(["Descargar / verificar firma"])
+    CU5(["Registrar producto importado"])
+    CU6(["Registrar venta"])
+    CU7(["Registrar ingreso de stock"])
+    CU8(["Integrar archivo de la filial"])
+    CU9(["Configurar tasas y políticas"])
+    CU10(["Agregar filial nueva"])
+  end
+  G --- CU1 & CU2 & CU3 & CU4 & CU5 & CU6 & CU7 & CU8 & CU9 & CU10
+  A --- CU1 & CU2 & CU3 & CU4 & CU5
+  O --- CU1 & CU2 & CU3 & CU6 & CU7 & CU8
+  CU3 -. "«include»" .-> CU2
+  CU8 -. "«include» adaptar formato" .-> CU6

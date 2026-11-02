@@ -1,0 +1,32 @@
+sequenceDiagram
+  autonumber
+  actor G as Gerente
+  participant UI as Frontend Angular
+  participant C as ReportesController
+  participant F as GeneradorReportesFacade
+  participant CS as ConsolidacionService
+  participant RP as RegistroPlantillas
+  participant B as ReporteBuilder
+  participant D as DirectorReportes
+  participant DEC as Decoradores
+  participant FE as FabricaExportadores
+  G->>UI: Elige tipo, periodo, filiales y capas
+  UI->>C: POST /api/reportes (token)
+  C->>C: GuardSeguridad valida rol y alcance
+  C->>F: generar(solicitud, usuario)
+  F->>CS: consolidar(desde, hasta, filiales)
+  CS-->>F: DatosConsolidados (en EUR, tasas del Singleton)
+  F->>RP: obtener(tipo, ámbito)
+  RP-->>F: clon personalizado de la plantilla (Prototype)
+  F->>B: desdePlantilla(clon)
+  F->>D: construir(tipo, builder, datos)
+  D->>B: conTitulo().paraPeriodo().deFiliales().seccion(...)...
+  B-->>D: construir() → Reporte (árbol Composite)
+  D-->>F: Reporte
+  F->>DEC: Índice → Marca de agua → Confidencial → Pie legal → Firma
+  DEC-->>F: DocumentoReporte decorado y firmado
+  F->>FE: crear(formato).exportar(documento)
+  FE-->>F: ArchivoExportado (HTML/CSV/JSON)
+  F-->>C: ResultadoReporte
+  C-->>UI: 201 Created
+  UI-->>G: Vista del reporte + descargas

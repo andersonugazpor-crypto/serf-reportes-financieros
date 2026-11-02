@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>SERF · Sustentación técnica</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+:root { --marino: #1e3a8a; --tinta: #1f2937; --gris: #6b7280; --linea: #d1d5db; --suave: #eef2ff; }
+* { box-sizing: border-box; }
+body { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; color: var(--tinta); font-size: 10.5pt; line-height: 1.5; margin: 0; }
+h1, h2, h3 { color: var(--marino); line-height: 1.2; }
+h2 { font-size: 17pt; margin: 0 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--marino); page-break-after: avoid; }
+h3 { font-size: 12.5pt; margin: 18px 0 6px; page-break-after: avoid; }
+p { margin: 0 0 8px; }
+section { page-break-before: always; }
+table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 9.5pt; page-break-inside: avoid; }
+th { background: var(--suave); color: var(--marino); text-align: left; }
+th, td { border: 1px solid var(--linea); padding: 5px 7px; vertical-align: top; }
+code, pre { font-family: Consolas, 'Courier New', monospace; font-size: 8.8pt; }
+pre { background: #0f172a; color: #e2e8f0; padding: 10px 12px; border-radius: 6px; white-space: pre-wrap; page-break-inside: avoid; margin: 6px 0 10px; }
+code { background: #f3f4f6; padding: 0 3px; border-radius: 3px; }
+pre code { background: none; padding: 0; }
+img { max-width: 100%; border: 1px solid var(--linea); border-radius: 4px; }
+figure { margin: 8px 0 12px; page-break-inside: avoid; text-align: center; }
+figcaption { font-size: 8.5pt; color: var(--gris); margin-top: 3px; }
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tres { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.nota { background: var(--suave); border-left: 4px solid var(--marino); padding: 8px 10px; margin: 8px 0; font-size: 9.5pt; page-break-inside: avoid; }
+.ok { color: #15803d; font-weight: 600; }
+/* Portada */
+.portada { height: 255mm; display: flex; flex-direction: column; justify-content: space-between; }
+.portada .franja { background: var(--marino); color: #fff; padding: 28px 30px; border-radius: 8px; }
+.portada .franja small { letter-spacing: .12em; text-transform: uppercase; opacity: .8; font-size: 9pt; }
+.portada h1 { color: #fff; font-size: 30pt; margin: 10px 0 6px; }
+.portada .datos td { border: 0; border-bottom: 1px solid var(--linea); padding: 8px 4px; font-size: 11pt; }
+.portada .datos td:first-child { color: var(--gris); width: 34%; }
+.indice li { margin: 3px 0; }
+</style>
+</head>
+<body>
+
+<div class="portada">
+  <div class="franja">
+    <small>IDAT · Escuela de Tecnología · Patrones de Diseño de Software · Evaluación parcial</small>
+    <h1>SERF</h1>
+    <div style="font-size:15pt">Sistema Empresarial de Gestión de Reportes Financieros</div>
+    <div style="opacity:.85;margin-top:6px">Documento de sustentación técnica · FinanCorp S.A.</div>
+  </div>
+  <table class="datos">
+    <tr><td>Integrante</td><td><strong>Anderson Leonel Ugaz Portales</strong></td></tr>
+    <tr><td>Repositorio (GitHub)</td><td>https://github.com/andersonugazpor-crypto/serf-reportes-financieros</td></tr>
+    <tr><td>Prototipo interactivo</td><td>https://claude.ai/artifact/SEvDNcQDCHTzC4shDhpgTM</td></tr>
+    <tr><td>Enlace de Figma</td><td><em>(pegar aquí el enlace "Share → Copy link" del archivo de Figma; ver sección 3.4)</em></td></tr>
+    <tr><td>Tecnologías</td><td>TypeScript · NestJS 11 · Angular 21 · Bootstrap 5 · Jest · Vitest</td></tr>
+    <tr><td>Fecha</td><td>Noviembre de 2026</td></tr>
+  </table>
+  <div>
+    <h3 style="margin-top:0">Contenido</h3>
+    <ol class="indice">
+      <li>Descripción del proyecto</li>
+      <li>Definición del problema y necesidades de los usuarios</li>
+      <li>Diseño de la solución: arquitectura, UML, wireframes y prototipo</li>
+      <li>Funcionalidades principales</li>
+      <li>Patrones de diseño creacionales aplicados</li>
+      <li>Patrones de diseño estructurales aplicados</li>
+      <li>Principios SOLID y diseño orientado a objetos</li>
+      <li>Configuración del entorno de desarrollo</li>
+      <li>Resultados de las pruebas</li>
+      <li>Problemas detectados y soluciones aplicadas</li>
+      <li>Conclusiones</li>
+    </ol>
+  </div>
+</div>
+
+<section>
+  <h2>1. Descripción del proyecto</h2>
+  <p><strong>FinanCorp S.A.</strong> importa productos tecnológicos fabricados en China (laptops, smartphones, accesorios y equipos de redes) y los vende mediante filiales en Europa y Latinoamérica. Cada filial administra su inventario y sus ventas con su propio sistema y formato, por lo que la consolidación mensual se hacía con validaciones manuales y sin un flujo automatizado de reportes.</p>
+  <p><strong>SERF</strong> es una aplicación web que:</p>
+  <ul>
+    <li>integra los datos de ventas e inventario de las cinco filiales (España, Alemania, México, Perú y Colombia), cualquiera sea su formato;</li>
+    <li>registra los productos importados y hace seguimiento de su venta y su stock;</li>
+    <li>genera automáticamente reportes financieros corporativos estandarizados, con clasificación de confidencialidad y firma digital verificable;</li>
+    <li>permite agregar filiales y cambiar políticas corporativas sin modificar el código.</li>
+  </ul>
+  <figure><img src="../capturas/02-panel.png" style="max-height:420px"><figcaption>Figura 1. Panel consolidado de SERF (rol gerencia).</figcaption></figure>
+  <p>El backend es una API REST en <strong>NestJS</strong> donde se concentran el dominio y los patrones de diseño. El frontend en <strong>Angular</strong> es responsive y consume esa API. Ambos están escritos en TypeScript con tipado estricto.</p>
+</section>
+
+<section>
+  <h2>2. Definición del problema y necesidades de los usuarios</h2>
+  <table>
+    <tr><th>Usuario</th><th>Necesidades</th><th>Solución en SERF</th></tr>
+    <tr><td><strong>Gerencia corporativa</strong> (ADMIN)</td><td>Ver la situación consolidada, obtener reportes confiables, ajustar políticas.</td><td>Panel en EUR, reporte de un clic, firma digital, configuración central, alta de filiales.</td></tr>
+    <tr><td><strong>Analista financiero</strong></td><td>Analizar ventas, márgenes e inventario; mantener el catálogo.</td><td>Asistente de reportes por tipo, periodo y filial; catálogo de productos; plantillas por país.</td></tr>
+    <tr><td><strong>Operador de filial</strong></td><td>Cargar los datos de su sistema; registrar ventas e ingresos de mercadería.</td><td>Integración por archivo con vista previa; ventas con control de stock; acceso limitado a su filial.</td></tr>
+  </table>
+  <h3>Procesos donde se aplican patrones</h3>
+  <table>
+    <tr><th>Proceso</th><th>Problema recurrente</th><th>Patrón</th></tr>
+    <tr><td>Integración de datos de filiales</td><td>Cada sistema exporta en un formato incompatible.</td><td>Adapter</td></tr>
+    <tr><td>Parámetros corporativos y acceso a datos</td><td>Debe existir un único punto de configuración y un único pool de conexiones.</td><td>Singleton</td></tr>
+    <tr><td>Plantillas de reporte por país</td><td>Repetir la misma estructura con variaciones locales.</td><td>Prototype</td></tr>
+    <tr><td>Armado de reportes</td><td>Objetos complejos con muchas partes opcionales.</td><td>Builder (+ Director)</td></tr>
+    <tr><td>Contenido del reporte</td><td>Secciones que contienen subsecciones y elementos.</td><td>Composite</td></tr>
+    <tr><td>Seguridad y extras del reporte</td><td>Agregar características sin tocar la estructura.</td><td>Decorator</td></tr>
+    <tr><td>Uso del generador</td><td>Muchos subsistemas detrás de una acción simple.</td><td>Facade</td></tr>
+    <tr><td>Formatos de salida</td><td>Crear exportadores sin acoplarse a clases concretas.</td><td>Fábrica</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>3. Diseño de la solución</h2>
+  <h3>3.1 Arquitectura</h3>
+  <figure><img src="../uml/01-arquitectura.png"><figcaption>Figura 2. Arquitectura: frontend Angular, API NestJS por módulos y capa de dominio con los patrones.</figcaption></figure>
+  <h3>3.2 Casos de uso</h3>
+  <figure><img src="../uml/06-casos-uso.png" style="max-height:330px"><figcaption>Figura 3. Casos de uso por rol.</figcaption></figure>
+</section>
+
+<section>
+  <h3 style="margin-top:0">3.3 Diagrama de secuencia: generación de un reporte</h3>
+  <figure><img src="../uml/05-secuencia-reporte.png"><figcaption>Figura 4. La fachada coordina consolidación, Prototype, Builder, Decorator y la fábrica de exportadores.</figcaption></figure>
+  <h3>3.4 Wireframes y prototipo interactivo</h3>
+  <p>Se diseñaron 10 pantallas en versión escritorio y móvil. El prototipo navegable está en <strong>https://claude.ai/artifact/SEvDNcQDCHTzC4shDhpgTM</strong> (fuente en <code>docs/prototipo/</code>). Las imágenes de <code>docs/wireframes/</code> se importan en Figma como frames y se enlazan con interacciones <em>On click → Navigate to</em> para obtener el enlace compartido de Figma (guía en <code>docs/02-diseno-wireframes-y-prototipo.md</code>).</p>
+  <div class="tres">
+    <figure><img src="../wireframes/02-panel.png"><figcaption>Panel</figcaption></figure>
+    <figure><img src="../wireframes/05-integrar.png"><figcaption>Integrar datos</figcaption></figure>
+    <figure><img src="../wireframes/09-resultado.png"><figcaption>Reporte generado</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>4. Funcionalidades principales</h2>
+  <div class="dos">
+    <figure><img src="../capturas/07-integracion.png"><figcaption>Integración: vista previa del XML de Perú normalizado.</figcaption></figure>
+    <figure><img src="../capturas/03-productos.png"><figcaption>Catálogo de productos importados.</figcaption></figure>
+    <figure><img src="../capturas/09-reporte-paso2.png"><figcaption>Asistente de reportes: periodo y filiales.</figcaption></figure>
+    <figure><img src="../capturas/14-configuracion.png"><figcaption>Configuración central y alta de filiales.</figcaption></figure>
+  </div>
+  <table>
+    <tr><th>Requisito</th><th>Implementación</th></tr>
+    <tr><td>1. Integrar datos de las filiales</td><td>Archivo nativo de cada filial → adaptador → vista previa → importación sin duplicados y actualización del inventario.</td></tr>
+    <tr><td>2. Registrar productos y seguir su venta</td><td>Catálogo (SKU, proveedor en China, costo USD, precio EUR); inventario con stock crítico; ventas en moneda local que descuentan stock.</td></tr>
+    <tr><td>3. Reportes automáticos, seguros y estandarizados</td><td>4 tipos; asistente o reporte rápido; HTML, CSV o JSON; índice, marca de agua, clasificación, aviso legal y firma HMAC-SHA256.</td></tr>
+    <tr><td>4. Escalable y adaptable</td><td>Alta de filiales desde la interfaz; adaptadores y exportadores registrables; políticas y tasas centralizadas.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>5. Patrones de diseño creacionales aplicados</h2>
+  <figure><img src="../uml/02-creacionales.png" style="max-height:230px"><figcaption>Figura 5. Diagrama de clases de los patrones creacionales.</figcaption></figure>
+  <h3>5.1 Singleton: configuración centralizada y pool de conexiones</h3>
+  <p><code>ConfiguracionCorporativa</code> y <code>PoolConexiones</code> tienen constructor privado y un método estático <code>obtenerInstancia()</code> que crea la instancia una sola vez (inicialización perezosa). El estado solo cambia mediante métodos que validan los datos, y <code>vista()</code> devuelve una copia congelada que no expone el secreto de firma. NestJS registra los Singletons con <code>useFactory</code> para reutilizar esa misma instancia.</p>
+<pre><code>private static instancia: ConfiguracionCorporativa | null = null;
+private constructor() { ... }
+static obtenerInstancia(): ConfiguracionCorporativa {
+  if (!ConfiguracionCorporativa.instancia) ConfiguracionCorporativa.instancia = new ConfiguracionCorporativa();
+  return ConfiguracionCorporativa.instancia;
+}</code></pre>
+  <p>El pool mantiene 5 conexiones reutilizables; <code>ejecutar()</code> presta una conexión y la devuelve en un bloque <code>finally</code>, aunque la operación falle.</p>
+  <h3>5.2 Prototype: plantillas base adaptadas a cada país</h3>
+  <p>Hay 4 plantillas base (ventas, inventario, rentabilidad, ejecutivo). <code>RegistroPlantillas.obtener(tipo, país)</code> <strong>clona</strong> la base y personaliza la copia: normativa (PGC, NIF, PCGE–SUNAT, HGB, NIIF), formato regional y texto legal. La clonación es <strong>profunda</strong>: copia el estilo, los textos y el árbol completo de secciones, de modo que el clon es independiente del original. Así se obtienen 24 variantes sin instanciar clases concretas por país.</p>
+<pre><code>clonar(): PlantillaReporte {
+  return new PlantillaReporte({ ..., estilo: { ...this.estilo },
+    textosLegales: [...this.textosLegales], estructura: this.estructura.clonar() }, false);
+}</code></pre>
+</section>
+
+<section>
+  <h3 style="margin-top:0">5.3 Builder: construcción paso a paso con API fluida</h3>
+  <p><code>ReporteBuilder</code> separa la construcción de la representación: el <code>Reporte</code> solo se crea en <code>construir()</code>, después de validar los pasos obligatorios. <code>SeccionBuilder</code> permite anidar subsecciones sin límite. El <strong>Director</strong> (<code>DirectorReportes</code>) aplica la receta estándar de cada tipo, por lo que todos los reportes de un tipo tienen el mismo formato.</p>
+<pre><code>ReporteBuilder.desdePlantilla(plantillaClonada)
+  .conTitulo('Reporte de ventas').paraPeriodo('2026-10-01', '2026-10-31').deFiliales(['ES', 'MX'])
+  .seccion('ventas-filial', s =&gt; s.tabla('Ventas por filial', columnas, filas, totales)
+     .subseccion('Detalle', d =&gt; d.parrafo('...').indicador('Margen %', 48.1, 'porcentaje')))
+  .construir();</code></pre>
+  <h3>5.4 Fábrica de exportadores</h3>
+  <p><code>FabricaExportadores.crear(formato)</code> devuelve la interfaz <code>Exportador</code> (HTML, CSV o JSON) sin que la fachada conozca las clases concretas. Para agregar un formato nuevo basta con registrarlo, sin modificar el código existente.</p>
+  <div class="nota">El Builder siempre parte de un <strong>clon</strong> de plantilla (Prototype) y lee la moneda, las tasas y el nombre de la empresa del <strong>Singleton</strong>: los tres patrones creacionales colaboran en cada reporte.</div>
+</section>
+
+<section>
+  <h2>6. Patrones de diseño estructurales aplicados</h2>
+  <figure><img src="../uml/03-estructurales.png"><figcaption>Figura 6. Diagrama de clases de los patrones estructurales.</figcaption></figure>
+  <h3>6.1 Composite: secciones y subsecciones</h3>
+  <p><code>ComponenteReporte</code> es la interfaz común de <code>Seccion</code> (compuesto) y de las hojas <code>Parrafo</code>, <code>Tabla</code>, <code>Grafico</code> e <code>Indicador</code>. Todos se cuentan, clonan, serializan y reciben marcadores de la misma forma. El anidamiento es ilimitado (una prueba crea 25 niveles) y se impiden ciclos. En el frontend, un componente Angular recursivo dibuja cualquier profundidad.</p>
+  <h3>6.2 Decorator: capas extra sin modificar el reporte</h3>
+  <p>Cada decorador envuelve un <code>IReporte</code> y agrega una sola característica: índice numerado, marca de agua, clasificación de confidencialidad, aviso legal o firma digital HMAC-SHA256. Las capas se apilan en cualquier combinación y quedan registradas en orden. La firma va siempre al final y <code>VerificadorFirma</code> detecta cualquier alteración posterior.</p>
+  <h3>6.3 Facade: interfaz simplificada</h3>
+  <p><code>GeneradorReportesFacade.generar()</code> y <code>generarRapido(tipo)</code> ocultan consolidación, plantillas, builder, decoradores y exportación. La interfaz web genera un reporte listo para enviar con <strong>un clic</strong>.</p>
+  <h3>6.4 Adapter: formatos de cada filial</h3>
+  <table>
+    <tr><th>Filial</th><th>Sistema local (adaptee)</th><th>Formato</th></tr>
+    <tr><td>España</td><td>ErpEspana</td><td>JSON con campos propios</td></tr>
+    <tr><td>México</td><td>PosMexico</td><td>CSV, fechas DD/MM/AAAA</td></tr>
+    <tr><td>Perú</td><td>SistemaContablePeru</td><td>XML con atributos</td></tr>
+    <tr><td>Alemania</td><td>WarenwirtschaftDeutschland</td><td>Secciones, separador ";" y coma decimal</td></tr>
+    <tr><td>Colombia y nuevas</td><td>—</td><td>JSON estándar corporativo</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>7. Principios SOLID y diseño orientado a objetos</h2>
+  <table>
+    <tr><th>Principio</th><th>Aplicación en SERF</th></tr>
+    <tr><td><strong>S</strong> · Responsabilidad única</td><td>ConsolidacionService calcula; DirectorReportes arma; cada decorador agrega una característica; cada exportador produce un formato; FiltroErrores traduce a HTTP.</td></tr>
+    <tr><td><strong>O</strong> · Abierto/cerrado</td><td>Una filial nueva implica registrar un adaptador; un formato nuevo, registrar un exportador; una capa nueva, una subclase de DecoradorReporte. No se modifica código existente.</td></tr>
+    <tr><td><strong>L</strong> · Liskov</td><td>Cualquier componente, decorador o adaptador sustituye a su abstracción sin cambiar el comportamiento esperado.</td></tr>
+    <tr><td><strong>I</strong> · Segregación de interfaces</td><td>Interfaces pequeñas: Repositorio&lt;T&gt;, Exportador, IReporte, Prototipo&lt;T&gt;, AdaptadorDatosFilial.</td></tr>
+    <tr><td><strong>D</strong> · Inversión de dependencias</td><td>Los servicios reciben Repositorio&lt;T&gt; mediante tokens de inyección; la persistencia concreta se configura en un solo módulo.</td></tr>
+  </table>
+  <h3>Diseño orientado a objetos</h3>
+  <ul>
+    <li><strong>Abstracción y herencia:</strong> <code>Entidad&lt;TDto&gt;</code> → Filial, Producto, Stock, Venta; <code>AdaptadorBase</code>, <code>DecoradorReporte</code> y <code>ComponenteReporte</code> como bases abstractas.</li>
+    <li><strong>Encapsulamiento completo:</strong> atributos privados con getters; los cambios pasan por métodos que validan. Por ejemplo, <code>Stock.retirar()</code> impide quedar en negativo y <code>Producto.actualizarPrecios()</code> exige montos positivos. Las colecciones se devuelven como copias.</li>
+    <li><strong>Objeto de valor</strong> <code>Dinero</code>: inmutable, trabaja en céntimos y no permite operar entre monedas sin convertir.</li>
+    <li><strong>Seguridad:</strong> contraseñas con scrypt y sal, tokens aleatorios con expiración, roles y alcance por filial verificados en el servidor.</li>
+  </ul>
+  <figure><img src="../uml/04-dominio.png" style="max-height:300px"><figcaption>Figura 7. Modelo de dominio.</figcaption></figure>
+</section>
+
+<section>
+  <h2>8. Configuración del entorno de desarrollo</h2>
+  <table>
+    <tr><th>Elemento</th><th>Detalle</th></tr>
+    <tr><td>Lenguaje</td><td>TypeScript 5.9 en modo estricto (backend y frontend)</td></tr>
+    <tr><td>Backend</td><td>NestJS 11 · class-validator · Jest + Supertest · ESLint + Prettier</td></tr>
+    <tr><td>Frontend</td><td>Angular 21 (componentes standalone, signals, carga diferida) · Bootstrap 5 · Vitest</td></tr>
+    <tr><td>Requisitos</td><td>Node.js 20.19 o superior y npm 10 o superior. No requiere base de datos.</td></tr>
+    <tr><td>Control de versiones</td><td>Git + GitHub, con un historial de commits por etapas y GitHub Actions (lint, pruebas y compilación en cada push)</td></tr>
+  </table>
+<pre><code>git clone https://github.com/andersonugazpor-crypto/serf-reportes-financieros.git
+cd serf-reportes-financieros
+npm install        # instala backend y frontend
+npm start          # API en :3000 y web en http://localhost:4200
+npm test           # pruebas de backend y frontend</code></pre>
+  <p>Cuentas de demostración: <code>gerente / Gerente2026!</code>, <code>analista / Analista2026!</code>, <code>operador.pe / Peru2026!</code>.</p>
+  <h3>Estructura del repositorio</h3>
+<pre><code>backend/src/   configuracion (Singleton) · infraestructura/persistencia (Singleton, Repositorio)
+               filiales/adaptadores (Adapter) · reportes/{composite, prototype, builder,
+               decorator, exportacion, consolidacion, fachada}
+backend/test/  unit/ (pruebas por patrón) · e2e/ (API completa)
+frontend/src/  core · layout · shared · pages
+docs/          definición, diseño, usabilidad, patrones, UML, wireframes, prototipo, capturas</code></pre>
+</section>
+
+<section>
+  <h2>9. Resultados de las pruebas</h2>
+  <h3>9.1 Pruebas unitarias y de integración</h3>
+  <table>
+    <tr><th>Suite</th><th>Pruebas</th><th>Verifica</th><th>Resultado</th></tr>
+    <tr><td>singleton.spec.ts</td><td>11</td><td>Instancia única, constructor privado, validación, pool</td><td class="ok">11/11 ✓</td></tr>
+    <tr><td>composite-prototype.spec.ts</td><td>12</td><td>Árbol ilimitado, ciclos, clonación profunda, variantes por país</td><td class="ok">12/12 ✓</td></tr>
+    <tr><td>builder-decorator.spec.ts</td><td>15</td><td>API fluida, pasos obligatorios, Director, capas, firma, exportadores</td><td class="ok">15/15 ✓</td></tr>
+    <tr><td>adapter-dominio.spec.ts</td><td>16</td><td>5 adaptadores, formatos locales, encapsulamiento de entidades</td><td class="ok">16/16 ✓</td></tr>
+    <tr><td>api.e2e.spec.ts</td><td>17</td><td>Roles, alcance por filial, stock, importación, fachada, verificación, Singleton</td><td class="ok">17/17 ✓</td></tr>
+    <tr><td>frontend app.spec.ts</td><td>6</td><td>Formato de cifras, gráfico, árbol recursivo, sesión</td><td class="ok">6/6 ✓</td></tr>
+    <tr><th>Total</th><th>77</th><th>Cobertura de líneas del backend: 92 %</th><th class="ok">77/77 ✓</th></tr>
+  </table>
+  <h3>9.2 Pruebas de usabilidad con usuarios simulados</h3>
+  <p>Se definieron tres perfiles (gerente en escritorio, operadora de la filial de Perú y usuario en celular) y se ejecutaron 9 tareas sobre la aplicación funcionando, registrando el resultado, el tiempo y el mensaje mostrado.</p>
+  <table>
+    <tr><th>Tarea</th><th>Resultado inicial</th></tr>
+    <tr><td>Vender más unidades de las disponibles</td><td>Se rechazaba, pero el stock no se veía antes.</td></tr>
+    <tr><td>Integrar un archivo con formato equivocado</td><td>Mensaje técnico que desaparecía.</td></tr>
+    <tr><td>Editar el archivo después de previsualizar</td><td><strong>Error:</strong> permitía importar con la vista previa anterior.</td></tr>
+    <tr><td>Generar un reporte de otra filial (operadora)</td><td class="ok">Correcto: solo ve su filial.</td></tr>
+    <tr><td>Periodo invertido en el asistente</td><td class="ok">Correcto: se avisa y no avanza.</td></tr>
+    <tr><td>Reporte del mes con un clic</td><td class="ok">Correcto: 3,5 s, firmado y confidencial.</td></tr>
+    <tr><td>Panel a inicio de mes</td><td>El mes en curso parecía una caída de ventas.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>10. Problemas detectados y soluciones aplicadas</h2>
+  <table>
+    <tr><th>#</th><th>Problema detectado</th><th>Solución aplicada</th></tr>
+    <tr><td>1</td><td>La vista previa quedaba obsoleta al editar el archivo de la filial.</td><td>La vista previa se invalida al cambiar el contenido y el botón Importar se deshabilita.</td></tr>
+    <tr><td>2</td><td>Mensaje de formato técnico y efímero.</td><td>El backend indica el formato esperado y la pantalla muestra el error fijo junto al archivo, con la sugerencia de usar el ejemplo.</td></tr>
+    <tr><td>3</td><td>El operador no veía el stock al vender.</td><td>Se muestra "Disponible: N u."; si se excede, el campo se marca y el botón se bloquea.</td></tr>
+    <tr><td>4</td><td>El reporte rápido salía vacío a inicio de mes.</td><td>El reporte rápido usa el último mes completo (cierre mensual).</td></tr>
+    <tr><td>5</td><td>El mes en curso parecía una caída en el gráfico.</td><td>El punto se etiqueta "(en curso)".</td></tr>
+    <tr><td>6</td><td>En el celular, los nombres de filial se partían en dos líneas.</td><td>Celdas sin salto de línea y tabla desplazable.</td></tr>
+    <tr><td>7</td><td>La barra lateral se cortaba en páginas largas.</td><td>El fondo se extiende a todo el alto de la página.</td></tr>
+  </table>
+  <p>La segunda ronda de pruebas confirmó las mejoras (figuras 8 y 9). Los cambios están en el commit <code>fix(ux): mejoras tras las pruebas de usabilidad</code>.</p>
+  <div class="dos">
+    <figure><img src="../capturas/mejora-stock.png"><figcaption>Figura 8. Stock disponible visible al registrar una venta.</figcaption></figure>
+    <figure><img src="../capturas/mejora-formato.png"><figcaption>Figura 9. Error de formato comprensible y fijo.</figcaption></figure>
+  </div>
+  <h3>Problemas técnicos durante la construcción</h3>
+  <table>
+    <tr><th>Problema</th><th>Solución</th></tr>
+    <tr><td>La firma debía cubrir todas las capas, incluida la lista de capas aplicadas.</td><td>La firma se calcula sobre un JSON canónico (claves ordenadas) que ya incluye su propia capa; el decorador de firma siempre se aplica al final.</td></tr>
+    <tr><td>Errores de redondeo al sumar montos en distintas monedas.</td><td>Objeto de valor <code>Dinero</code> en céntimos enteros y conversión explícita con las tasas del Singleton.</td></tr>
+    <tr><td>Las plantillas clonadas compartían el árbol de secciones (clonación superficial).</td><td><code>clonar()</code> recursivo en cada componente Composite; pruebas que verifican la independencia del clon.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>11. Conclusiones</h2>
+  <ul>
+    <li>Los <strong>patrones creacionales</strong> resolvieron la configuración única (Singleton), la reutilización de plantillas por país sin duplicar código (Prototype) y la construcción ordenada y validada de reportes complejos (Builder con Director).</li>
+    <li>Los <strong>patrones estructurales</strong> permitieron integrar sistemas incompatibles (Adapter), representar reportes jerárquicos de cualquier profundidad (Composite), agregar seguridad en capas sin modificar el contenido (Decorator) y ofrecer una operación de un clic (Facade).</li>
+    <li>Los <strong>principios SOLID</strong> hacen que el sistema sea escalable: una filial, un formato de archivo o un formato de salida nuevos se agregan registrando una clase, sin modificar las existentes.</li>
+    <li>Las <strong>pruebas</strong> (77 automatizadas, todas aprobadas, y 9 tareas de usabilidad) detectaron 7 problemas que se corrigieron y verificaron en una segunda ronda.</li>
+  </ul>
+  <div class="nota"><strong>Enlaces</strong><br>Repositorio: https://github.com/andersonugazpor-crypto/serf-reportes-financieros<br>Prototipo: https://claude.ai/artifact/SEvDNcQDCHTzC4shDhpgTM<br>Figma: (pegar enlace)<br>Integrante: Anderson Leonel Ugaz Portales</div>
+</section>
+
+</body>
+</html>

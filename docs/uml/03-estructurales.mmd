@@ -1,0 +1,116 @@
+classDiagram
+  direction TB
+  class ComponenteReporte {
+    <<abstract · Composite>>
+    +id string
+    +aNodo(nivel)* NodoReporte
+    +clonar()* ComponenteReporte
+    +reemplazarMarcadores(valores)*
+    +contarElementos() number
+  }
+  class Seccion {
+    <<Compuesto>>
+    -hijos ComponenteReporte[]
+    +agregar(componentes) this
+    +quitar(id) boolean
+    +profundidad() number
+    +buscarSeccion(clave) Seccion
+  }
+  class Parrafo
+  class Tabla
+  class Grafico
+  class Indicador
+  ComponenteReporte <|-- Seccion
+  ComponenteReporte <|-- Parrafo
+  ComponenteReporte <|-- Tabla
+  ComponenteReporte <|-- Grafico
+  ComponenteReporte <|-- Indicador
+  Seccion o-- "0..*" ComponenteReporte : hijos
+
+  class IReporte {
+    <<interface · Decorator>>
+    +obtenerDocumento() DocumentoReporte
+  }
+  class Reporte {
+    -cuerpo Seccion
+    +obtenerDocumento() DocumentoReporte
+  }
+  class DecoradorReporte {
+    <<abstract>>
+    #envuelto IReporte
+    +obtenerDocumento() DocumentoReporte
+    #decorar(doc)* DocumentoReporte
+  }
+  class IndiceDecorator
+  class MarcaAguaDecorator
+  class ConfidencialDecorator
+  class PieLegalDecorator
+  class FirmaDigitalDecorator
+  IReporte <|.. Reporte
+  IReporte <|.. DecoradorReporte
+  DecoradorReporte o-- IReporte : envuelve
+  DecoradorReporte <|-- IndiceDecorator
+  DecoradorReporte <|-- MarcaAguaDecorator
+  DecoradorReporte <|-- ConfidencialDecorator
+  DecoradorReporte <|-- PieLegalDecorator
+  DecoradorReporte <|-- FirmaDigitalDecorator
+  Reporte *-- Seccion
+
+  class GeneradorReportesFacade {
+    <<Facade>>
+    +generar(solicitud, usuario) ResultadoReporte
+    +generarRapido(tipo, usuario) ResultadoReporte
+    +exportar(id, formato) ArchivoExportado
+    +verificar(documento) Verificacion
+  }
+  GeneradorReportesFacade ..> ConsolidacionService
+  GeneradorReportesFacade ..> RegistroPlantillas
+  GeneradorReportesFacade ..> DirectorReportes
+  GeneradorReportesFacade ..> DecoradorReporte
+  GeneradorReportesFacade ..> FabricaExportadores
+
+  class AdaptadorDatosFilial {
+    <<interface · Adapter Target>>
+    +formato FormatoDatos
+    +adaptar(contenido, moneda) LoteNormalizado
+  }
+  class AdaptadorBase {
+    <<abstract>>
+    #traducir(contenido, moneda, lote)*
+  }
+  class AdaptadorEspana
+  class AdaptadorMexico
+  class AdaptadorPeru
+  class AdaptadorAlemania
+  class AdaptadorEstandar
+  class ErpEspana {
+    <<Adaptee>>
+    +leerExportacion(json)
+  }
+  class PosMexico {
+    <<Adaptee>>
+    +leerFilas(csv)
+  }
+  class SistemaContablePeru {
+    <<Adaptee>>
+    +extraerNodos(xml)
+  }
+  class WarenwirtschaftDeutschland {
+    <<Adaptee>>
+    +lesen(text)
+  }
+  AdaptadorDatosFilial <|.. AdaptadorBase
+  AdaptadorBase <|-- AdaptadorEspana
+  AdaptadorBase <|-- AdaptadorMexico
+  AdaptadorBase <|-- AdaptadorPeru
+  AdaptadorBase <|-- AdaptadorAlemania
+  AdaptadorBase <|-- AdaptadorEstandar
+  AdaptadorEspana --> ErpEspana
+  AdaptadorMexico --> PosMexico
+  AdaptadorPeru --> SistemaContablePeru
+  AdaptadorAlemania --> WarenwirtschaftDeutschland
+  class RegistroAdaptadores {
+    +registrar(adaptador)
+    +obtener(formato) AdaptadorDatosFilial
+  }
+  RegistroAdaptadores o-- AdaptadorDatosFilial

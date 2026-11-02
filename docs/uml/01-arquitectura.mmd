@@ -1,0 +1,37 @@
+flowchart LR
+  subgraph Cliente["Navegador (escritorio / móvil)"]
+    UI["Frontend Angular 21<br/>Bootstrap 5 · signals<br/>Panel · Productos · Inventario<br/>Ventas · Integración · Reportes"]
+  end
+  subgraph API["Backend NestJS 11 — API REST /api"]
+    direction TB
+    SEG["AuthModule<br/>GuardSeguridad · roles · scrypt"]
+    CTRL["Controladores<br/>Filiales · Productos · Inventario<br/>Ventas · Reportes · Panel · Configuración"]
+    SRV["Servicios de aplicación<br/>VentasService · InventarioService<br/>ConsolidacionService"]
+    FAC["«Facade»<br/>GeneradorReportesFacade"]
+    subgraph Dominio["Dominio y patrones"]
+      ADP["«Adapter»<br/>Adaptadores por filial"]
+      PRO["«Prototype»<br/>RegistroPlantillas"]
+      BLD["«Builder»<br/>ReporteBuilder + Director"]
+      CMP["«Composite»<br/>Seccion / hojas"]
+      DEC["«Decorator»<br/>Capas del reporte"]
+      FAB["«Factory»<br/>FabricaExportadores"]
+    end
+    CFG["«Singleton»<br/>ConfiguracionCorporativa"]
+    POOL["«Singleton»<br/>PoolConexiones"]
+    REPO["Repositorio&lt;T&gt;<br/>(interfaz)"]
+    BD[("Base de datos<br/>en memoria")]
+  end
+  ERP["Sistemas locales de filiales<br/>JSON · CSV · XML · TXT"]
+  UI -- "HTTPS + Bearer token" --> SEG --> CTRL
+  CTRL --> SRV
+  CTRL --> FAC
+  ERP -. "archivo exportado" .-> UI
+  SRV --> ADP
+  FAC --> SRV
+  FAC --> PRO --> BLD --> CMP
+  FAC --> DEC
+  FAC --> FAB
+  SRV --> REPO --> POOL --> BD
+  SRV -.-> CFG
+  DEC -.-> CFG
+  POOL -.-> CFG

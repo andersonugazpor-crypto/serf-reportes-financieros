@@ -1,0 +1,453 @@
+<title>Prototipo SERF</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: mesa de trabajo de wireframes — barra de control arriba, lienzo de pantalla al centro, notas del diseñador a la derecha. */
+:root {
+  --papel: #eef1f6;        /* mesa de dibujo */
+  --hoja: #ffffff;         /* pantalla */
+  --tinta: #1c2433;        /* texto */
+  --gris: #8a94a6;         /* trazos secundarios */
+  --bloque: #dde2eb;       /* rellenos de wireframe */
+  --linea: #c3cad6;
+  --marino: #1e3a8a;       /* acento: el azul corporativo de FinanCorp */
+  --nota: #fff6d6;         /* notas del diseñador */
+  --nota-borde: #e6c96a;
+  --peligro: #c2410c;
+  --exito: #15803d;
+  --f-ui: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --papel: #121722; --hoja: #1a2130; --tinta: #e4e8f0; --gris: #7d879a; --bloque: #2a3344; --linea: #3a4458;
+  --marino: #8aa4ff; --nota: #2e2a17; --nota-borde: #7a6a2c; --peligro: #fb923c; --exito: #4ade80; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --papel: #121722; --hoja: #1a2130; --tinta: #e4e8f0; --gris: #7d879a; --bloque: #2a3344; --linea: #3a4458;
+  --marino: #8aa4ff; --nota: #2e2a17; --nota-borde: #7a6a2c; --peligro: #fb923c; --exito: #4ade80; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--papel); color: var(--tinta); font: 15px/1.5 var(--f-ui);
+  background-image: radial-gradient(var(--linea) 1px, transparent 1px); background-size: 22px 22px; }
+.envoltura { max-width: 1500px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--marino); outline-offset: 2px; }
+
+/* Barra de control */
+.control { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin-bottom: 16px; }
+.control h1 { font-size: 1.25rem; font-weight: 700; }
+.control .sub { font-family: var(--f-mono); font-size: .75rem; color: var(--gris); letter-spacing: .04em; text-transform: uppercase; }
+.seg { display: inline-flex; border: 1px solid var(--linea); border-radius: 8px; overflow: hidden; background: var(--hoja); }
+.seg button { border: 0; background: transparent; padding: 6px 12px; cursor: pointer; font-size: .85rem; }
+.seg button[aria-pressed="true"] { background: var(--marino); color: var(--hoja); }
+.mapa { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+.mapa button { border: 1px dashed var(--linea); background: var(--hoja); border-radius: 999px; padding: 3px 10px; font-size: .78rem; cursor: pointer; font-family: var(--f-mono); }
+.mapa button[aria-current="true"] { border-style: solid; border-color: var(--marino); color: var(--marino); font-weight: 500; }
+
+.mesa { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+@media (max-width: 1000px) { .mesa { grid-template-columns: minmax(0, 1fr); } }
+
+/* Marco del dispositivo */
+.marco { background: var(--hoja); border: 1px solid var(--linea); border-radius: 14px; overflow: hidden; margin-inline: auto;
+  box-shadow: 0 1px 0 var(--linea), 0 18px 40px -24px rgba(20, 30, 60, .35); width: 100%; transition: max-width .25s; }
+.marco.movil { max-width: 390px; }
+.marco .barra-ventana { height: 30px; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-bottom: 1px solid var(--linea); font-family: var(--f-mono); font-size: .72rem; color: var(--gris); }
+.marco .barra-ventana i { width: 9px; height: 9px; border-radius: 50%; background: var(--bloque); display: inline-block; }
+.pantalla { min-height: 620px; display: flex; }
+.pantalla > * { min-width: 0; }
+
+/* Primitivas de wireframe */
+.lateral { width: 190px; flex-shrink: 0; border-right: 1px solid var(--linea); padding: 14px 10px; display: flex; flex-direction: column; gap: 4px; background: color-mix(in srgb, var(--marino) 6%, var(--hoja)); }
+.lateral .logo { font-weight: 700; color: var(--marino); padding: 4px 8px 12px; }
+.lateral .grupo { font-family: var(--f-mono); font-size: .65rem; text-transform: uppercase; letter-spacing: .08em; color: var(--gris); padding: 10px 8px 2px; }
+.lateral button { text-align: left; border: 0; background: transparent; border-radius: 6px; padding: 6px 8px; cursor: pointer; font-size: .86rem; }
+.lateral button[aria-current="page"] { background: var(--marino); color: var(--hoja); font-weight: 600; }
+.cuerpo { flex: 1; padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+.movil .lateral { display: none; }
+.movil .cuerpo { padding: 14px; }
+.barra-movil { display: none; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--linea); padding: 8px 12px; }
+.movil .barra-movil { display: flex; }
+.movil .pantalla { flex-direction: column; }
+
+.titulo { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.titulo h2 { font-size: 1.3rem; }
+.titulo p { margin: 2px 0 0; color: var(--gris); font-size: .88rem; }
+.caja { border: 1.5px solid var(--linea); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.caja h3 { font-size: .9rem; }
+.fila { display: flex; flex-wrap: wrap; gap: 12px; }
+.fila > * { flex: 1 1 160px; }
+.grid2 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+.movil .grid2 { grid-template-columns: 1fr; }
+.texto { height: 9px; border-radius: 4px; background: var(--bloque); }
+.texto.c { width: 40%; } .texto.m { width: 65%; } .texto.l { width: 90%; }
+.kpi { border: 1.5px solid var(--linea); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.kpi b { font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.kpi small { color: var(--gris); font-size: .75rem; }
+.kpi.alerta { border-color: var(--peligro); }
+.btn { border: 1.5px solid var(--marino); color: var(--marino); background: transparent; border-radius: 8px; padding: 7px 14px; cursor: pointer; font-weight: 600; font-size: .86rem; }
+.btn.lleno { background: var(--marino); color: var(--hoja); }
+.btn.exito { border-color: var(--exito); background: var(--exito); color: var(--hoja); }
+.campo { display: flex; flex-direction: column; gap: 4px; font-size: .8rem; color: var(--gris); }
+.campo span.input { height: 34px; border: 1.5px solid var(--linea); border-radius: 7px; display: flex; align-items: center; padding: 0 10px; color: var(--tinta); font-size: .86rem; }
+.campo span.input.error { border-color: var(--peligro); }
+.campo em { color: var(--peligro); font-style: normal; font-size: .75rem; }
+.tabla { width: 100%; border-collapse: collapse; font-size: .82rem; font-variant-numeric: tabular-nums; }
+.tabla th { text-align: left; font-weight: 600; border-bottom: 1.5px solid var(--linea); padding: 6px; color: var(--gris); }
+.tabla td { border-bottom: 1px solid var(--linea); padding: 6px; }
+.tabla td.n, .tabla th.n { text-align: right; }
+.desplaza { overflow-x: auto; }
+.chip { border: 1.5px solid var(--linea); border-radius: 999px; padding: 2px 10px; font-size: .78rem; display: inline-block; }
+.chip.on { background: var(--tinta); color: var(--hoja); border-color: var(--tinta); }
+.chip.rojo { border-color: var(--peligro); color: var(--peligro); }
+.barras { display: flex; flex-direction: column; gap: 6px; }
+.barras div { display: grid; grid-template-columns: 70px 1fr; gap: 8px; align-items: center; font-size: .75rem; }
+.barras i { height: 10px; border-radius: 5px; background: var(--marino); opacity: .8; display: block; }
+.linea-svg { width: 100%; height: 120px; }
+.pasos { display: flex; flex-wrap: wrap; gap: 8px; }
+.paso { border: 1.5px solid var(--linea); border-radius: 999px; padding: 3px 12px 3px 4px; font-size: .8rem; display: inline-flex; align-items: center; gap: 6px; }
+.paso b { width: 20px; height: 20px; border-radius: 50%; background: var(--bloque); display: inline-flex; align-items: center; justify-content: center; font-size: .7rem; }
+.paso.actual { border-color: var(--marino); color: var(--marino); } .paso.actual b { background: var(--marino); color: var(--hoja); }
+.paso.hecho b { background: var(--exito); color: var(--hoja); }
+.opciones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.movil .opciones { grid-template-columns: 1fr; }
+.opcion { border: 1.5px solid var(--linea); border-radius: 10px; padding: 12px; text-align: left; background: transparent; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+.opcion.sel { border-color: var(--marino); box-shadow: inset 0 0 0 1px var(--marino); }
+.opcion small { color: var(--gris); }
+.interruptor { display: flex; align-items: center; gap: 8px; font-size: .86rem; }
+.interruptor i { width: 30px; height: 16px; border-radius: 8px; background: var(--marino); position: relative; display: inline-block; }
+.interruptor i::after { content: ""; position: absolute; right: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--hoja); }
+.interruptor i.off { background: var(--bloque); } .interruptor i.off::after { right: auto; left: 2px; }
+.aviso { border-radius: 8px; padding: 8px 10px; font-size: .8rem; border: 1.5px dashed var(--peligro); color: var(--peligro); }
+.aviso.ok { border-color: var(--exito); color: var(--exito); }
+.documento { position: relative; overflow: hidden; }
+.documento .agua { position: absolute; inset: 40% 0 auto; text-align: center; font-size: 3.5rem; font-weight: 700; color: var(--peligro); opacity: .08; transform: rotate(-20deg); pointer-events: none; }
+.arbol { font-family: var(--f-mono); font-size: .78rem; line-height: 1.7; margin: 0; padding-left: 0; list-style: none; }
+.arbol ul { list-style: none; padding-left: 16px; border-left: 1px dashed var(--linea); margin: 0; }
+.codigo { font-family: var(--f-mono); font-size: .72rem; background: var(--bloque); border-radius: 8px; padding: 10px; white-space: pre; overflow-x: auto; margin: 0; }
+
+/* Zonas clicables del prototipo */
+.vinculo { position: relative; }
+.mostrar-zonas .vinculo { outline: 2px dashed #f59e0b; outline-offset: 2px; }
+
+/* Notas del diseñador */
+.notas { background: var(--nota); border: 1px solid var(--nota-borde); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+.notas h2 { font-size: 1rem; }
+.notas .eti { font-family: var(--f-mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--gris); }
+.notas ul { margin: 0; padding-left: 18px; font-size: .86rem; display: flex; flex-direction: column; gap: 6px; }
+.notas .patron { font-family: var(--f-mono); font-size: .78rem; border-top: 1px dashed var(--nota-borde); padding-top: 10px; }
+.notas .siguiente { display: flex; flex-wrap: wrap; gap: 6px; }
+@media (prefers-reduced-motion: reduce) { .marco { transition: none; } }
+</style>
+
+<div class="envoltura">
+  <div class="control">
+    <div>
+      <div class="sub">FinanCorp S.A. · Wireframes y prototipo navegable</div>
+      <h1>SERF — Sistema Empresarial de Gestión de Reportes Financieros</h1>
+    </div>
+    <div class="seg" role="group" aria-label="Dispositivo">
+      <button id="btn-escritorio" type="button" aria-pressed="true">Escritorio</button>
+      <button id="btn-movil" type="button" aria-pressed="false">Móvil</button>
+    </div>
+    <label class="interruptor" style="cursor:pointer"><input id="zonas" type="checkbox" style="accent-color: var(--marino)"> Mostrar zonas clicables</label>
+    <nav class="mapa" id="mapa" aria-label="Mapa de pantallas"></nav>
+  </div>
+
+  <div class="mesa">
+    <div class="marco" id="marco">
+      <div class="barra-ventana"><i></i><i></i><i></i><span id="url">serf.financorp.local/login</span></div>
+      <div id="pantalla"></div>
+    </div>
+    <aside class="notas" id="notas" aria-live="polite"></aside>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const ir = (id) => `data-ir="${id}"`;
+
+const lateral = (activa) => `
+  <aside class="lateral">
+    <div class="logo">▮ SERF</div>
+    <div class="grupo">General</div>
+    <button class="vinculo" ${ir('panel')} ${activa === 'panel' ? 'aria-current="page"' : ''}>Panel</button>
+    <button class="vinculo" ${ir('reporte-1')} ${activa === 'reportes' ? 'aria-current="page"' : ''}>Reportes</button>
+    <div class="grupo">Operación</div>
+    <button class="vinculo" ${ir('productos')} ${activa === 'productos' ? 'aria-current="page"' : ''}>Productos</button>
+    <button>Inventario</button>
+    <button>Ventas</button>
+    <button class="vinculo" ${ir('integrar')} ${activa === 'integrar' ? 'aria-current="page"' : ''}>Integrar datos</button>
+    <div class="grupo">Administración</div>
+    <button>Plantillas</button>
+    <button class="vinculo" ${ir('configuracion')} ${activa === 'configuracion' ? 'aria-current="page"' : ''}>Configuración</button>
+    <div style="margin-top:auto" class="texto m"></div>
+  </aside>
+  <div class="barra-movil"><span>☰</span><b style="color:var(--marino)">SERF</b><button class="btn lleno vinculo" ${ir('reporte-1')}>+ Reporte</button></div>`;
+
+const pasos = (n) => `<div class="pasos">${['Tipo de reporte', 'Periodo y filiales', 'Seguridad y formato']
+  .map((t, i) => `<span class="paso ${i + 1 === n ? 'actual' : i + 1 < n ? 'hecho' : ''}"><b>${i + 1 < n ? '✓' : i + 1}</b>${t}</span>`).join('')}</div>`;
+
+const PANTALLAS = {
+  login: {
+    nombre: 'Inicio de sesión', ruta: 'login',
+    html: () => `
+      <div class="cuerpo" style="align-items:center;justify-content:center">
+        <div class="caja" style="width:min(380px,100%)">
+          <h2 style="font-size:1.2rem">Iniciar sesión</h2>
+          <div class="campo">Usuario<span class="input">gerente</span></div>
+          <div class="campo">Contraseña<span class="input">••••••••••</span></div>
+          <button class="btn lleno vinculo" ${ir('panel')}>Ingresar</button>
+          <div class="texto l"></div><div class="texto m"></div>
+          <small style="color:var(--gris)">Cuentas demo: gerente · analista · operador.pe</small>
+        </div>
+      </div>`,
+    notas: ['Acceso por rol: gerencia, analista u operador de filial.', 'Las cuentas demo se rellenan con un clic para agilizar las pruebas.', 'Errores de credenciales se muestran arriba del formulario.'],
+    patron: 'Seguridad: contraseñas con scrypt y token con expiración (8 h).',
+    siguiente: ['panel'],
+  },
+  panel: {
+    nombre: 'Panel consolidado', ruta: 'panel',
+    html: () => `${lateral('panel')}
+      <div class="cuerpo">
+        <div class="titulo"><div><h2>Buenas tardes, Lucía</h2><p>Situación consolidada de las filiales</p></div><button class="btn lleno vinculo" ${ir('reporte-1')}>Nuevo reporte</button></div>
+        <div class="fila"><span class="chip on">90 días</span><span class="chip">ES</span><span class="chip">DE</span><span class="chip">MX</span><span class="chip">PE</span><span class="chip">CO</span></div>
+        <div class="fila">
+          <div class="kpi"><small>Ingresos consolidados</small><b>353.487 €</b></div>
+          <div class="kpi"><small>Margen bruto</small><b>48,4 %</b></div>
+          <div class="kpi"><small>Unidades vendidas</small><b>1.198</b></div>
+          <div class="kpi alerta"><small>Inventario a costo</small><b>674.448 €</b><small style="color:var(--peligro)">6 con stock crítico</small></div>
+        </div>
+        <div class="grid2">
+          <div class="caja"><h3>Ingresos por mes (EUR)</h3>
+            <svg class="linea-svg" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true"><polyline points="10,60 100,40 190,48 290,100" fill="none" stroke="var(--marino)" stroke-width="2.5"/><line x1="10" y1="110" x2="290" y2="110" stroke="var(--linea)"/></svg>
+            <div class="desplaza"><table class="tabla"><tr><th>Filial</th><th class="n">Local</th><th class="n">EUR</th><th class="n">Margen</th></tr>
+            <tr><td>España</td><td class="n">105.450 €</td><td class="n">105.450 €</td><td class="n">50,7 %</td></tr>
+            <tr><td>México</td><td class="n">1.719.280 MXN</td><td class="n">87.683 €</td><td class="n">48,5 %</td></tr>
+            <tr><td>Colombia</td><td class="n">106.793.000 COP</td><td class="n">24.562 €</td><td class="n"><span class="chip rojo">27 %</span></td></tr></table></div>
+          </div>
+          <div class="caja"><h3>⚡ Reporte rápido del mes anterior</h3>
+            <button class="btn vinculo" ${ir('resultado')}>Financiero ejecutivo</button><button class="btn">Ventas</button><button class="btn">Inventario</button>
+            <h3>Alertas</h3><div class="aviso">6 combinaciones con stock crítico</div>
+          </div>
+        </div>
+      </div>`,
+    notas: ['Primero el resumen (KPI) y después el detalle por filial.', 'Montos en moneda local y consolidados en EUR, lado a lado.', 'El estado se codifica con color: margen bajo y stock crítico en rojo.', '“Reporte rápido”: un clic para el cierre mensual.'],
+    patron: 'Facade: el reporte rápido llama a generarRapido(tipo) y recibe el documento listo, firmado.',
+    siguiente: ['reporte-1', 'resultado', 'productos'],
+  },
+  productos: {
+    nombre: 'Productos importados', ruta: 'productos',
+    html: () => `${lateral('productos')}
+      <div class="cuerpo">
+        <div class="titulo"><div><h2>Productos importados</h2><p>Catálogo de productos traídos desde China</p></div><button class="btn lleno vinculo" ${ir('producto-form')}>Registrar producto</button></div>
+        <div class="fila"><div class="campo"><span class="input">🔍 Buscar por SKU, nombre o marca</span></div><div><span class="chip on">Todas</span> <span class="chip">Laptops</span> <span class="chip">Smartphones</span> <span class="chip">Redes</span></div></div>
+        <div class="caja desplaza"><table class="tabla"><tr><th>Producto</th><th class="n">Costo USD</th><th class="n">Precio EUR</th><th class="n">Margen ref.</th></tr>
+          <tr><td>Laptop Huawei MateBook D15<br><small style="color:var(--gris)">LT-001 · Huawei</small></td><td class="n">520,00 $</td><td class="n">899 €</td><td class="n">46,8 %</td></tr>
+          <tr><td>Smartphone OPPO Reno 12<br><small style="color:var(--gris)">SP-102 · OPPO</small></td><td class="n">260,00 $</td><td class="n">499 €</td><td class="n">52,1 %</td></tr>
+          <tr><td>Router TP-Link Archer AX55<br><small style="color:var(--gris)">RD-301 · TP-Link</small></td><td class="n">48,00 $</td><td class="n">109 €</td><td class="n">59,5 %</td></tr></table></div>
+      </div>`,
+    notas: ['Búsqueda inmediata y filtros por categoría en forma de chips.', 'El margen de referencia se calcula con la tasa USD de la configuración central.'],
+    patron: 'Encapsulamiento: Producto valida el SKU y que los precios sean positivos.',
+    siguiente: ['producto-form'],
+  },
+  'producto-form': {
+    nombre: 'Registrar producto', ruta: 'productos/nuevo',
+    html: () => `${lateral('productos')}
+      <div class="cuerpo">
+        <div class="caja" style="max-width:640px">
+          <h3>Registrar producto importado</h3>
+          <div class="fila"><div class="campo">SKU<span class="input error">xx</span><em>Formato: LT-004</em></div><div class="campo" style="flex:2">Nombre<span class="input">Cargador GaN 65W</span></div></div>
+          <div class="fila"><div class="campo">Categoría<span class="input">Accesorios ▾</span></div><div class="campo">Marca<span class="input">Ugreen</span></div><div class="campo">Proveedor en China<span class="input">Ugreen (Shenzhen)</span></div></div>
+          <div class="fila"><div class="campo">Costo de importación (USD)<span class="input">18,00</span></div><div class="campo">Precio de lista (EUR)<span class="input">45,00</span></div></div>
+          <div class="aviso ok">Margen de referencia: 63,2 %</div>
+          <div class="fila" style="justify-content:flex-end"><button class="btn vinculo" ${ir('productos')}>Cancelar</button><button class="btn lleno vinculo" ${ir('productos')}>Guardar</button></div>
+        </div>
+      </div>`,
+    notas: ['Validación en el campo, con el formato esperado como ayuda.', 'El margen se previsualiza mientras se escriben los precios.'],
+    patron: 'Formulario reactivo + validación en el dominio (doble capa).',
+    siguiente: ['productos'],
+  },
+  integrar: {
+    nombre: 'Integrar datos de filial', ruta: 'integracion',
+    html: () => `${lateral('integrar')}
+      <div class="cuerpo">
+        <div class="titulo"><div><h2>Integrar datos de filiales</h2><p>Sube el archivo del sistema local; SERF lo convierte al formato corporativo</p></div></div>
+        <div class="grid2" style="grid-template-columns:1fr 1.4fr">
+          <div class="caja"><h3>1 · Filial de origen</h3>
+            <span class="opcion">🇪🇸 FinanCorp España <small>JSON_ES · EUR</small></span>
+            <span class="opcion sel">🇵🇪 FinanCorp Perú <small>XML_PE · PEN</small></span>
+            <h3>2 · Formato esperado</h3>
+            <pre class="codigo">&lt;venta codigo="PE-B-301"
+  fecha="2026-10-04"
+  producto="SP-102" cantidad="2"
+  precio="1899.00"/&gt;</pre>
+          </div>
+          <div class="caja"><h3>3 · Archivo de la filial</h3>
+            <div class="campo"><span class="input">📎 reporte-peru-octubre.xml</span></div>
+            <div class="fila"><button class="btn">Previsualizar</button><button class="btn exito">Importar</button></div>
+            <h3>Vista previa en formato estándar</h3>
+            <div><span class="chip on">2 ventas</span> <span class="chip">2 existencias</span></div>
+            <div class="desplaza"><table class="tabla"><tr><th>Referencia</th><th>Fecha</th><th>SKU</th><th class="n">Precio</th></tr>
+            <tr><td>PE-B-301</td><td>2026-10-04</td><td>SP-102</td><td class="n">S/ 1.899,00</td></tr>
+            <tr><td>PE-B-302</td><td>2026-10-08</td><td>RD-301</td><td class="n">S/ 289,90</td></tr></table></div>
+          </div>
+        </div>
+      </div>`,
+    notas: ['Tres pasos visibles: filial, formato esperado y archivo.', 'Previsualizar antes de importar evita cargar datos mal interpretados.', 'Las ventas duplicadas se omiten automáticamente.'],
+    patron: 'Adapter: cada formato (JSON, CSV, XML, ERP alemán) tiene un adaptador que produce el mismo LoteNormalizado.',
+    siguiente: ['panel'],
+  },
+  'reporte-1': {
+    nombre: 'Reporte · paso 1', ruta: 'reportes',
+    html: () => `${lateral('reportes')}
+      <div class="cuerpo">
+        <div class="titulo"><div><h2>Reportes financieros</h2><p>Estandarizados, con seguridad y listos para enviar</p></div></div>
+        ${pasos(1)}
+        <div class="caja"><h3>¿Qué reporte necesitas?</h3>
+          <div class="opciones">
+            <button class="opcion sel">Financiero ejecutivo<small>Ventas, rentabilidad e inventario</small></button>
+            <button class="opcion">Ventas<small>Por filial, categoría y mes</small></button>
+            <button class="opcion">Rentabilidad<small>Margen frente al costo de importación</small></button>
+            <button class="opcion">Inventario<small>Existencias y stock crítico</small></button>
+          </div>
+          <div class="fila" style="justify-content:flex-end"><button class="btn lleno vinculo" ${ir('reporte-2')}>Siguiente →</button></div>
+        </div>
+      </div>`,
+    notas: ['Asistente de 3 pasos: una decisión por pantalla.', 'Los tipos se describen por su contenido, no por su nombre técnico.'],
+    patron: 'Prototype: cada tipo tiene una plantilla base que luego se clona.',
+    siguiente: ['reporte-2'],
+  },
+  'reporte-2': {
+    nombre: 'Reporte · paso 2', ruta: 'reportes',
+    html: () => `${lateral('reportes')}
+      <div class="cuerpo">
+        ${pasos(2)}
+        <div class="caja"><h3>Periodo y filiales</h3>
+          <div class="fila"><span class="chip">Mes anterior</span><span class="chip on">Último semestre</span><span class="chip">Último trimestre</span></div>
+          <div class="fila"><div class="campo">Desde<span class="input">01/05/2026</span></div><div class="campo">Hasta<span class="input">31/10/2026</span></div></div>
+          <div class="opciones">
+            <span class="opcion sel">🇪🇸 España ✓</span><span class="opcion sel">🇲🇽 México ✓</span><span class="opcion sel">🇵🇪 Perú ✓</span><span class="opcion">🇩🇪 Alemania</span>
+          </div>
+          <small style="color:var(--gris)">Varias filiales → plantilla corporativa en EUR. Una sola → plantilla del país.</small>
+          <div class="fila" style="justify-content:space-between"><button class="btn vinculo" ${ir('reporte-1')}>← Atrás</button><button class="btn lleno vinculo" ${ir('reporte-3')}>Siguiente →</button></div>
+        </div>
+      </div>`,
+    notas: ['Atajos de periodo frecuentes para el cierre mensual o semestral.', 'Se explica qué plantilla se usará según las filiales elegidas.'],
+    patron: 'Prototype: RegistroPlantillas.obtener(tipo, país) devuelve un clon personalizado.',
+    siguiente: ['reporte-3'],
+  },
+  'reporte-3': {
+    nombre: 'Reporte · paso 3', ruta: 'reportes',
+    html: () => `${lateral('reportes')}
+      <div class="cuerpo">
+        ${pasos(3)}
+        <div class="caja"><h3>Seguridad y formato</h3>
+          <div class="grid2" style="grid-template-columns:1fr 1fr">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <span class="interruptor"><i></i>Índice de contenidos</span>
+              <span class="interruptor"><i></i>Aviso legal corporativo</span>
+              <span class="interruptor"><i></i>Firma digital</span>
+              <div class="campo">Clasificación<span class="input">Confidencial ▾</span></div>
+              <div class="campo">Marca de agua<span class="input">BORRADOR</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="campo">Título (opcional)<span class="input">Se genera automáticamente</span></div>
+              <div class="seg"><button aria-pressed="true">HTML</button><button>CSV</button><button>JSON</button></div>
+            </div>
+          </div>
+          <div class="fila" style="justify-content:space-between"><button class="btn vinculo" ${ir('reporte-2')}>← Atrás</button><button class="btn exito vinculo" ${ir('resultado')}>Generar reporte</button></div>
+        </div>
+      </div>`,
+    notas: ['Cada opción agrega una capa sin cambiar el contenido.', 'Formatos explicados por su uso: enviar, Excel o verificar firma.'],
+    patron: 'Decorator: Índice → Marca de agua → Confidencial → Pie legal → Firma, apilados como capas.',
+    siguiente: ['resultado'],
+  },
+  resultado: {
+    nombre: 'Reporte generado', ruta: 'reportes?id=…',
+    html: () => `${lateral('reportes')}
+      <div class="cuerpo">
+        <div class="fila" style="flex-wrap:wrap"><button class="btn vinculo" ${ir('reporte-1')} style="flex:0">+ Nuevo</button><button class="btn lleno" style="flex:0">Abrir / imprimir</button><span class="seg" style="flex:0"><button>HTML</button><button>CSV</button><button>JSON</button></span></div>
+        <div class="grid2" style="grid-template-columns:3fr 1fr">
+          <div class="caja documento"><div class="agua" aria-hidden="true">BORRADOR</div>
+            <div class="aviso">CONFIDENCIAL — Distribución limitada a gerencia</div>
+            <h3 style="font-size:1.1rem;color:var(--marino)">Reporte financiero corporativo — Consolidado</h3>
+            <small style="color:var(--gris)">Periodo 2026-05-01 al 2026-10-31 · EUR</small>
+            <ul class="arbol"><li>1. Resumen ejecutivo<ul><li>▪ KPI: Ingresos · Margen % · Unidades</li></ul></li>
+              <li>2. Análisis detallado<ul><li>2.1 Ventas<ul><li>2.1.1 Ventas por filial ▪ tabla ▪ torta</li><li>2.1.3 Tendencia mensual<ul><li>2.1.3.1 Productos más vendidos</li></ul></li></ul></li><li>2.2 Rentabilidad</li><li>2.3 Inventario</li></ul></li>
+              <li>3. Notas y alertas</li></ul>
+            <small style="color:var(--exito)">✓ Firma HMAC-SHA256: 3f749d1e…</small>
+          </div>
+          <div class="caja"><h3>Capas aplicadas</h3>
+            <ol style="margin:0;padding-left:18px;font-size:.8rem;display:flex;flex-direction:column;gap:4px"><li>Reporte base</li><li>Índice</li><li>Marca de agua</li><li>Confidencial</li><li>Aviso legal</li><li>Firma digital</li></ol>
+          </div>
+        </div>
+      </div>`,
+    notas: ['El documento se muestra igual que el archivo descargado.', 'Vista alterna “Estructura (árbol)” para ver la jerarquía.', 'Botón de verificación de firma para detectar alteraciones.'],
+    patron: 'Builder + Composite: el Director arma secciones y subsecciones sin límite de profundidad.',
+    siguiente: ['reporte-1', 'panel'],
+  },
+  configuracion: {
+    nombre: 'Configuración central', ruta: 'configuracion',
+    html: () => `${lateral('configuracion')}
+      <div class="cuerpo">
+        <div class="titulo"><div><h2>Configuración corporativa</h2><p>Valores únicos para todo el sistema</p></div></div>
+        <div class="aviso ok">Instancia única: un cambio se aplica de inmediato a todos los reportes.</div>
+        <div class="grid2" style="grid-template-columns:1fr 1fr">
+          <div class="caja"><h3>Tasas de cambio hacia EUR</h3>
+            <table class="tabla"><tr><td>USD</td><td class="n">0,92</td></tr><tr><td>MXN</td><td class="n">0,051</td></tr><tr><td>PEN</td><td class="n">0,245</td></tr><tr><td>COP</td><td class="n">0,00023</td></tr></table>
+          </div>
+          <div class="caja"><h3>Políticas</h3>
+            <div class="fila"><div class="campo">Stock mínimo<span class="input">15</span></div><div class="campo">Margen objetivo<span class="input">25 %</span></div></div>
+            <h3>Pool de conexiones</h3><div class="fila"><span class="chip on">#1</span><span class="chip">#2</span><span class="chip">#3</span><span class="chip">#4</span><span class="chip">#5</span></div>
+          </div>
+        </div>
+        <div class="caja"><h3>Agregar una filial nueva</h3>
+          <div class="fila"><div class="campo">Código<span class="input">CL</span></div><div class="campo">Nombre<span class="input">FinanCorp Chile</span></div><div class="campo">Moneda<span class="input">CLP ▾</span></div><div class="campo">Formato<span class="input">ESTANDAR ▾</span></div></div>
+        </div>
+      </div>`,
+    notas: ['Solo la gerencia puede modificar; el analista ve los valores en modo lectura.', 'Escalabilidad: una filial nueva solo necesita sus datos y un formato.'],
+    patron: 'Singleton: ConfiguracionCorporativa y PoolConexiones existen una sola vez en el servidor.',
+    siguiente: ['panel'],
+  },
+};
+
+const ORDEN = ['login', 'panel', 'productos', 'producto-form', 'integrar', 'reporte-1', 'reporte-2', 'reporte-3', 'resultado', 'configuracion'];
+let actual = 'login';
+
+function mostrar(id) {
+  if (!PANTALLAS[id]) id = 'login';
+  actual = id;
+  const p = PANTALLAS[id];
+  $('#pantalla').innerHTML = `<div class="pantalla">${p.html()}</div>`;
+  $('#url').textContent = `serf.financorp.local/${p.ruta}`;
+  $('#notas').innerHTML = `
+    <div class="eti">Pantalla ${ORDEN.indexOf(id) + 1} de ${ORDEN.length}</div>
+    <h2>${p.nombre}</h2>
+    <div class="eti">Decisiones de diseño</div>
+    <ul>${p.notas.map((n) => `<li>${n}</li>`).join('')}</ul>
+    <div class="patron">${p.patron}</div>
+    <div class="eti">Navega a</div>
+    <div class="siguiente">${p.siguiente.map((s) => `<button class="btn" data-ir="${s}">${PANTALLAS[s].nombre}</button>`).join('')}</div>`;
+  document.querySelectorAll('#mapa button').forEach((b) => b.setAttribute('aria-current', String(b.dataset.ir === id)));
+  if (location.hash.slice(1) !== id) history.replaceState(null, '', '#' + id);
+}
+
+$('#mapa').innerHTML = ORDEN.map((id, i) => `<button type="button" data-ir="${id}">${i + 1}. ${PANTALLAS[id].nombre}</button>`).join('');
+document.addEventListener('click', (e) => {
+  const destino = e.target.closest('[data-ir]');
+  if (destino) mostrar(destino.dataset.ir);
+});
+const dispositivo = (movil) => {
+  $('#marco').classList.toggle('movil', movil);
+  $('#btn-movil').setAttribute('aria-pressed', String(movil));
+  $('#btn-escritorio').setAttribute('aria-pressed', String(!movil));
+};
+$('#btn-movil').addEventListener('click', () => dispositivo(true));
+$('#btn-escritorio').addEventListener('click', () => dispositivo(false));
+$('#zonas').addEventListener('change', (e) => $('#marco').classList.toggle('mostrar-zonas', e.target.checked));
+window.addEventListener('hashchange', () => mostrar(location.hash.slice(1)));
+if (matchMedia('(max-width: 600px)').matches) dispositivo(true);
+mostrar(location.hash.slice(1) || 'login');
+</script>
