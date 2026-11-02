@@ -1,0 +1,107 @@
+<serf-encabezado [titulo]="saludo()" descripcion="Situación consolidada de ventas e inventario de las filiales.">
+  <a routerLink="/reportes" class="btn btn-primary"><i class="bi bi-file-earmark-plus me-1"></i>Nuevo reporte</a>
+</serf-encabezado>
+
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body d-flex flex-column flex-lg-row gap-3 align-items-lg-center">
+    <div class="btn-group" role="group" aria-label="Periodo">
+      @for (r of ['30', '90', '180']; track r) {
+        <button type="button" class="btn btn-sm" [class]="rango() === r ? 'btn-primary' : 'btn-outline-primary'" (click)="cambiarRango($any(r))">
+          Últimos {{ r }} días
+        </button>
+      }
+    </div>
+    <div class="d-flex flex-wrap gap-2 ms-lg-auto" role="group" aria-label="Filiales">
+      @for (f of filiales(); track f.codigo) {
+        <button type="button" class="btn btn-sm rounded-pill" [class]="seleccion().includes(f.codigo) ? 'btn-dark' : 'btn-outline-secondary'"
+                [attr.aria-pressed]="seleccion().includes(f.codigo)" (click)="alternarFilial(f.codigo)">
+          {{ bandera[f.codigo] }} {{ f.codigo }}
+        </button>
+      }
+    </div>
+  </div>
+</div>
+
+@if (cargando() && !datos()) {
+  <serf-cargando texto="Consolidando información de las filiales…" />
+} @else if (datos(); as d) {
+  <div class="row g-3 mb-4" [class.opacity-50]="cargando()">
+    @for (k of kpis(); track k.etiqueta) {
+      <div class="col-sm-6 col-xxl-3">
+        <serf-kpi [etiqueta]="k.etiqueta" [valor]="k.valor" [icono]="k.icono" [color]="k.color" [detalle]="k.detalle" [alerta]="k.alerta ?? false" />
+      </div>
+    }
+  </div>
+
+  <div class="row g-4">
+    <div class="col-xl-8 d-grid gap-4">
+      <section class="card border-0 shadow-sm">
+        <div class="card-body">
+          <serf-grafico titulo="Ingresos por mes (EUR)" tipo="linea" [serie]="serieMes()" unidad="EUR" />
+        </div>
+      </section>
+      <section class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h2 class="h6 fw-semibold mb-3">Ventas por filial</h2>
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead class="table-light">
+                <tr><th>Filial</th><th class="text-end">Moneda local</th><th class="text-end">Consolidado (EUR)</th><th class="text-end">Margen</th><th class="text-end d-none d-md-table-cell">Unidades</th></tr>
+              </thead>
+              <tbody>
+                @for (f of d.porFilial; track f.codigo) {
+                  <tr>
+                    <td><span class="me-1">{{ bandera[f.codigo] }}</span>{{ f.nombre }}</td>
+                    <td class="text-end small">{{ f.ingresosLocal | cifra: 'moneda' : f.monedaLocal }}</td>
+                    <td class="text-end fw-semibold">{{ f.ingresos | cifra: 'moneda' : 'EUR' }}</td>
+                    <td class="text-end">
+                      <span class="badge" [class]="f.margenPct < d.margenObjetivo ? 'text-bg-danger' : 'text-bg-success'">{{ f.margenPct | cifra: 'porcentaje' }}</span>
+                    </td>
+                    <td class="text-end d-none d-md-table-cell">{{ f.unidades | cifra }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-xl-4 d-grid gap-4 align-content-start">
+      <section class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h2 class="h6 fw-semibold mb-1"><i class="bi bi-lightning-charge text-warning me-1"></i>Reporte rápido del mes anterior</h2>
+          <p class="small text-body-secondary">Un clic: todas tus filiales, confidencial, con índice y firma digital.</p>
+          <div class="d-grid gap-2">
+            @for (t of [{ tipo: 'EJECUTIVO', texto: 'Financiero ejecutivo', icono: 'bi-briefcase' }, { tipo: 'VENTAS', texto: 'Ventas', icono: 'bi-cart-check' }, { tipo: 'INVENTARIO', texto: 'Inventario', icono: 'bi-boxes' }]; track t.tipo) {
+              <button type="button" class="btn btn-outline-primary text-start" [disabled]="generando() !== null" (click)="reporteRapido($any(t.tipo))">
+                @if (generando() === t.tipo) { <span class="spinner-border spinner-border-sm me-2"></span> } @else { <i class="bi me-2" [class]="t.icono"></i> }
+                {{ t.texto }}
+              </button>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="card border-0 shadow-sm">
+        <div class="card-body">
+          <serf-grafico titulo="Ingresos por categoría" tipo="torta" [serie]="serieCategoria()" unidad="EUR" />
+        </div>
+      </section>
+
+      <section class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h2 class="h6 fw-semibold mb-3"><i class="bi bi-bell text-danger me-1"></i>Alertas</h2>
+          @for (a of d.alertas; track a) {
+            <div class="alert alert-warning py-2 small mb-2">{{ a }}</div>
+          } @empty {
+            <serf-vacio icono="bi-check2-circle" titulo="Sin alertas" />
+          }
+          @if (d.inventario.criticos.length) {
+            <a routerLink="/inventario" class="small">Ver productos con stock crítico <i class="bi bi-arrow-right"></i></a>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+}

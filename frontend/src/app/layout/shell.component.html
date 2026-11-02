@@ -1,0 +1,55 @@
+<div class="shell">
+  <aside class="lateral" [class.abierto]="menuAbierto()" aria-label="Menú principal">
+    <div class="marca">
+      <span class="logo"><i class="bi bi-bar-chart-line-fill"></i></span>
+      <div>
+        <div class="fw-bold">SERF</div>
+        <div class="small opacity-75">FinanCorp S.A.</div>
+      </div>
+      <button class="btn btn-link text-white ms-auto d-lg-none" type="button" aria-label="Cerrar menú" (click)="menuAbierto.set(false)">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <nav class="flex-grow-1">
+      @for (g of grupos(); track g.nombre) {
+        <div class="grupo">{{ g.nombre }}</div>
+        @for (e of g.enlaces; track e.ruta) {
+          <a class="enlace" [routerLink]="e.ruta" routerLinkActive="activo" ariaCurrentWhenActive="page">
+            <i class="bi" [class]="e.icono"></i>{{ e.texto }}
+          </a>
+        }
+      }
+    </nav>
+    @if (sesion.usuario(); as u) {
+      <div class="usuario">
+        <span class="avatar">{{ u.nombre.charAt(0) }}</span>
+        <div class="min-w-0 flex-grow-1">
+          <div class="fw-semibold text-truncate">{{ u.nombre }}</div>
+          <div class="small opacity-75 text-truncate">
+            {{ rol() }}
+            @if (u.filial) {
+              · {{ bandera[u.filial] }} {{ u.filial }}
+            }
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline-light" type="button" title="Cerrar sesión" aria-label="Cerrar sesión" (click)="salir()">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    }
+  </aside>
+  @if (menuAbierto()) {
+    <div class="velo d-lg-none" (click)="menuAbierto.set(false)"></div>
+  }
+
+  <div class="principal">
+    <header class="barra-movil d-lg-none">
+      <button class="btn btn-light" type="button" aria-label="Abrir menú" (click)="menuAbierto.set(true)"><i class="bi bi-list fs-5"></i></button>
+      <span class="fw-bold">SERF</span>
+      <a routerLink="/reportes" class="btn btn-primary btn-sm"><i class="bi bi-file-earmark-plus"></i> Reporte</a>
+    </header>
+    <main class="contenido">
+      <router-outlet />
+    </main>
+  </div>
+</div>

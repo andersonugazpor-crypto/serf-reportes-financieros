@@ -1,0 +1,134 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+@media (min-width: 992px) {
+  /* El color de la barra lateral continúa aunque la página sea más alta que la pantalla. */
+  .shell { background: linear-gradient(90deg, #1e3a8a 250px, transparent 250px); }
+}
+
+.lateral {
+  width: 250px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #172554 0%, #1e3a8a 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem .75rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .25rem .5rem 1.25rem;
+}
+
+.logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: .75rem;
+  background: rgba(255, 255, 255, .15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.grupo {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  opacity: .55;
+  padding: .9rem .75rem .35rem;
+}
+
+.enlace {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  color: rgba(255, 255, 255, .82);
+  text-decoration: none;
+  padding: .6rem .75rem;
+  border-radius: .6rem;
+  margin-bottom: 2px;
+  transition: background-color .15s;
+
+  &:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+  &.activo { background: #fff; color: #1e3a8a; font-weight: 600; }
+  &:focus-visible { outline: 2px solid #fbbf24; outline-offset: 1px; }
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .75rem .5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, .15);
+  margin-top: .75rem;
+}
+
+.avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: #fbbf24;
+  color: #172554;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.min-w-0 { min-width: 0; }
+
+.principal {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.contenido {
+  padding: 2rem;
+  max-width: 1400px;
+  width: 100%;
+}
+
+.barra-movil {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .6rem 1rem;
+  background: var(--bs-body-bg);
+  border-bottom: 1px solid var(--bs-border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.velo {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, .45);
+  z-index: 1040;
+}
+
+@media (max-width: 991.98px) {
+  .lateral {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1050;
+    transform: translateX(-100%);
+    transition: transform .2s ease;
+    &.abierto { transform: none; }
+  }
+  .contenido { padding: 1.25rem 1rem; }
+}
